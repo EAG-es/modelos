@@ -9,6 +9,7 @@ import innui.bases;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 import static innui.modelos.errores.Loggers.traducir;
+import java.util.logging.Logger;
 
 /**
  *
@@ -69,6 +70,13 @@ public class SystemLogger_utils extends bases implements System.Logger {
         logger.log(traducir(level), format, params);
     }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
 
     public static System.Logger.Level traducir(java.util.logging.Level level) {
         System.Logger.Level logger_level = System.Logger.Level.ALL;

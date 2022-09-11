@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.zip.ZipEntry;
@@ -31,7 +30,7 @@ import java.util.zip.ZipInputStream;
  */
 public class jars extends bases {
 
-    public static String k_in_ruta = "in/innui/modelos/configuracion/in";
+    public static String k_in_ruta = "in/innui/modelos/configuraciones/in";
     /**
      * Copia un recurso localizado relativo a una clase, a una ruta de destino.
      * @param clase Clase de referencia relativa
@@ -79,10 +78,9 @@ public class jars extends bases {
             String ruta_absoluta_destino;
             inputStream = clase.getResourceAsStream(ruta_origen_recurso);
             ruta_absoluta_destino = rutas.crear_ruta_desde_clase(clase, ruta_destino_relativo, ok);
-            ok.es = (ruta_absoluta_destino != null);
-            if (ok.es) {
-                ok.es = copiar(inputStream, ruta_absoluta_destino, ok);
-            }
+            ok.no_nul(ruta_absoluta_destino);
+            if (ok.es == false) { return false; }
+            copiar(inputStream, ruta_absoluta_destino, ok);
             return ok.es;
         } catch (Exception e) {
             throw e; // Ayuda para la depuración
@@ -106,14 +104,10 @@ public class jars extends bases {
                 path = Paths.get(ruta_destino);
                 Files.copy(inputstream, path, REPLACE_EXISTING);
             } catch (Exception e) {
-                ok.txt = e.getMessage();
-                if (ok.txt == null) {
-                    ok.txt = "";
-                }
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.txt = tr.in(in, "ERROR AL COPIAR LA SERIE DE ENTRADA (PUEDE SER UN PROBLEMA CON LOS PERMISOS DE LA CARPETA). ")
-                    + ok.txt
-                    + " " + Arrays.asList(e.getStackTrace()).toString();
+                ok.setTxt(tr.in(in, "ERROR AL COPIAR LA SERIE DE ENTRADA (PUEDE SER UN PROBLEMA CON LOS PERMISOS DE LA CARPETA). ")
+                    , ok.txt);
+                ok.setTxt(ok.getTxt(), e);
                 ok.es = false;
             }
             return ok.es;
@@ -136,15 +130,13 @@ public class jars extends bases {
             String ruta_absoluta_destino;
             File file;
             ruta_absoluta_destino = rutas.crear_ruta_desde_clase(clase, ruta_recurso, ok);
-            ok.es = (ruta_absoluta_destino != null);
-            if (ok.es) {
-                file = new File(ruta_absoluta_destino);
-                if (file.exists() == false) {
-                    ok.es = crear_rutas_padre(file, ok);
-                    if (ok.es) {
-                        ok.es = copiar_recurso(clase, ruta_recurso, ruta_absoluta_destino, ok);
-                    }
-                }
+            ok.no_nul(ruta_absoluta_destino);
+            if (ok.es == false) { return false; }
+            file = new File(ruta_absoluta_destino);
+            if (file.exists() == false) {
+                crear_rutas_padre(file, ok);
+                if (ok.es == false) { return false; }
+                copiar_recurso(clase, ruta_recurso, ruta_absoluta_destino, ok);
             }
             return ok.es;
         } catch (Exception e) {
@@ -167,14 +159,12 @@ public class jars extends bases {
             String ruta_absoluta_destino = null;
             File file;
             ruta_absoluta_destino = rutas.crear_ruta_desde_clase(clase, ruta_destino_recurso, ok);
-            ok.es = (ruta_absoluta_destino != null);
-            if (ok.es) {
-                file = new File(ruta_absoluta_destino);
-                ok.es = crear_rutas_padre(file, ok);
-                if (ok.es) {
-                    ok.es = copiar_recurso(clase, ruta_origen_recurso, ruta_absoluta_destino, ok);
-                }
-            }
+            ok.no_nul(ruta_absoluta_destino);
+            if (ok.es == false) { return false; }
+            file = new File(ruta_absoluta_destino);
+            ok.es = crear_rutas_padre(file, ok);
+            if (ok.es == false) { return false; }
+            ok.es = copiar_recurso(clase, ruta_origen_recurso, ruta_absoluta_destino, ok);
             return ok.es;
         } catch (Exception e) {
             throw e; // Ayuda para la depuración
@@ -196,6 +186,9 @@ public class jars extends bases {
             List<String> contenido_lista = new ArrayList<>();
             ok.es = listar_contenido_de_jar(clase, contenido_lista, ok);
             if (ok.es) {
+                if (ruta_origen_recurso.endsWith(File.separator) == false) {
+                    ruta_origen_recurso=ruta_origen_recurso + File.separator;
+                }
                 for (String ruta: contenido_lista) {
                     if (ruta.startsWith(ruta_origen_recurso)) {
                         ok.es = instalar_fuera(clase, ruta, ok);
@@ -232,42 +225,42 @@ public class jars extends bases {
         int pos_barra;
         try {
             ruta = leer_ruta_jar_desde_clase(clase, ok);
-            ok.es = (ruta != null);
-            if (ok.es) {
-                zip = new ZipInputStream(new FileInputStream(ruta));
-                while (true) {
-                    zipentry = zip.getNextEntry();
-                    if (zipentry == null) {
-                        break;
-                    } 
-                    if (zipentry.isDirectory()) {
-                        nombre = zipentry.getName();
-                        directorios_lista.add(nombre);
-                    }
+            ok.no_nul(ruta);
+            if (ok.es == false) { return false; }
+            ok.iniciar();
+            zip = new ZipInputStream(new FileInputStream(ruta));
+            while (true) {
+                zipentry = zip.getNextEntry();
+                if (zipentry == null) {
+                    break;
+                } 
+                if (zipentry.isDirectory()) {
+                    nombre = zipentry.getName();
+                    directorios_lista.add(nombre);
                 }
-                zip = new ZipInputStream(new FileInputStream(ruta));
-                while (true) {
-                    zipentry = zip.getNextEntry();
-                    if (zipentry == null) {
-                        break;
-                    } 
-                    if (zipentry.isDirectory() == false) {
-                        nombre = zipentry.getName();
-                        nombre = nombre.replace('.', '/');
-                        while (true) {
-                            pos_barra = nombre.lastIndexOf("/");
-                            if (pos_barra >= 0) {
-                                if (directorios_lista.contains(nombre.substring(0, pos_barra+1)) == false) {
-                                    nombre = nombre.substring(0, pos_barra) + "." + nombre.substring(pos_barra + 1);
-                                } else {
-                                    break;
-                                }
+            }
+            zip = new ZipInputStream(new FileInputStream(ruta));
+            while (true) {
+                zipentry = zip.getNextEntry();
+                if (zipentry == null) {
+                    break;
+                } 
+                if (zipentry.isDirectory() == false) {
+                    nombre = zipentry.getName();
+                    nombre = nombre.replace('.', '/');
+                    while (true) {
+                        pos_barra = nombre.lastIndexOf("/");
+                        if (pos_barra >= 0) {
+                            if (directorios_lista.contains(nombre.substring(0, pos_barra+1)) == false) {
+                                nombre = nombre.substring(0, pos_barra) + "." + nombre.substring(pos_barra + 1);
                             } else {
                                 break;
                             }
+                        } else {
+                            break;
                         }
-                        contenido_lista.add("/" + nombre);
                     }
+                    contenido_lista.add("/" + nombre);
                 }
             }
         } catch (Exception e) {
@@ -276,9 +269,9 @@ public class jars extends bases {
                 ok.txt = "";
             }
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.txt = tr.in(in, "ERROR DE EXCEPCIÓN AL LISTAR EL CONTENIDO DE UN JAR. ")
-                + ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL LISTAR EL CONTENIDO DE UN JAR. ")
+                , ok.txt);
+            ok.setTxt(ok.getTxt(), e);
             ok.es = false;
         }
         return ok.es;

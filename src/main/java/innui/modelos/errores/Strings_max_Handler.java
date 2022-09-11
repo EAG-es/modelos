@@ -38,23 +38,30 @@ public class Strings_max_Handler extends Handler {
             String mensaje = formatter.format(record);
             if (max_tam != 0) {
                 if (linkedList.size() >= max_tam) {
-                    linkedList.removeFirst();
+                    synchronized (linkedList) {
+                        linkedList.removeFirst();
+                    }
                 }
-                linkedList.addLast(mensaje);
+                synchronized (linkedList) {
+                    linkedList.addLast(mensaje);
+                }
             }
         }
     }
 
     @Override
     public String toString() {
-        String mensaje = "";
+        StringBuilder mensaje = new StringBuilder();
         for (String texto: linkedList) {
             if (mensaje.isEmpty() == false) {
-                mensaje = mensaje + "\n\t";
+                mensaje.append("\n\t");
             }
-            mensaje = mensaje + texto;
+            if (texto == null) {
+                texto = "";
+            }
+            mensaje.append(texto);
         }
-        return mensaje;
+        return mensaje.toString();
     }
 
     @Override

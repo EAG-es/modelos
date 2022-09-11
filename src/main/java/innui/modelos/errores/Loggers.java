@@ -12,7 +12,6 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Handler;
@@ -26,11 +25,30 @@ import java.util.ResourceBundle;
  */
 public class Loggers extends SystemLogger_utils {
     public static String k_in_ruta = "in/innui/modelos/errores/in";
+    /**
+     * Número máximo de registros que guardar
+     */
     public static String k_registros_max_Integer = "registros_max_Integer";
+    /**
+     * Número máximo de registros que guardar, por defecto
+     */
     public static Integer k_registros_max_Integer_por_defecto = 100;
+    /**
+     * Nivel mínimo: Ver java.util.logging.Level 
+     */
     public static String k_min_level = "min_Level";
+    /**
+     * Nivel mínimo por defecto
+     */
     public static java.util.logging.Level k_min_level_por_defecto = java.util.logging.Level.ALL;
+    /**
+     * Lista de manejadores del logger
+     * Si no hay ninguno, se añaden: Strings_max_Handler(registros_max_Integer, min_level) y consoleHandler().
+     */
     public static String k_handlers_List_Handler = "handlers_List_Handler";
+    public static String k_handlers_no_string_max_handler = "handlers_no_string_max_handler";
+    public static String k_handlers_no_ConsoleHandler = "handlers_no_ConsoleHandler";
+    
     /**
      * Registra e inicia un logger con unas caracteristicas concretas, o por defecto
      * @param sufijo null, para el sufijo por defecto; un sufijo se usaría en lugar del sufijo por defecto
@@ -44,7 +62,7 @@ public class Loggers extends SystemLogger_utils {
         try {
             if (ok.es == false) { return null; }
             Loggers logger = Loggers.getLogger(sufijo);
-            ok.es = reconfigurar(logger.logger, opciones_mapa, ok);
+            reconfigurar(logger.logger, opciones_mapa, ok);
             if (ok.es == false) {
                 logger = null;
             }
@@ -62,6 +80,7 @@ public class Loggers extends SystemLogger_utils {
      * @return true si todo va bien
      * @throws Exception Opción de notificar errores de excepción
      */
+    @SuppressWarnings("unchecked")
     public static boolean reconfigurar(java.util.logging.Logger logger, Map<String, Object> opciones_mapa, oks ok, Object ... extra_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
@@ -94,20 +113,26 @@ public class Loggers extends SystemLogger_utils {
                 handlers_list = (List<Handler>) opciones_mapa.get(k_handlers_List_Handler);
             }
             if (handlers_list == null) {
-                handlers_list = new ArrayList();
-                strings_max_Handler = new Strings_max_Handler(registros_max_Integer, min_level);
-                handlers_list.add(strings_max_Handler);
-                consoleHandler = new ConsoleHandler();
-                handlers_list.add(consoleHandler);
-                handler_array = logger.getHandlers();
-                for (Handler handler: handler_array) {
-                    logger.removeHandler(handler);
+                handlers_list = new ArrayList<>();
+                if (opciones_mapa == null || opciones_mapa.get(k_handlers_no_string_max_handler) == null) {
+                    strings_max_Handler = new Strings_max_Handler(registros_max_Integer, min_level);
+                    handlers_list.add(strings_max_Handler);
                 }
-                for (Handler handler: handlers_list) {
-                    logger.addHandler(handler);
+                if (opciones_mapa == null || opciones_mapa.get(k_handlers_no_ConsoleHandler) == null) {
+                    consoleHandler = new ConsoleHandler();
+                    handlers_list.add(consoleHandler);
                 }
-                if (opciones_mapa != null) {
-                    opciones_mapa.put(k_handlers_List_Handler, handlers_list);
+                if (handlers_list.isEmpty() == false) {
+                    handler_array = logger.getHandlers();
+                    for (Handler handler: handler_array) {
+                        logger.removeHandler(handler);
+                    }
+                    for (Handler handler: handlers_list) {
+                        logger.addHandler(handler);
+                    }
+                    if (opciones_mapa != null) {
+                        opciones_mapa.put(k_handlers_List_Handler, handlers_list);
+                    }
                 }
             }
             return ok.es;
@@ -146,14 +171,10 @@ public class Loggers extends SystemLogger_utils {
                 retorno = retorno + File.separator;
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.txt = tr.in(in, "NO SE HA PODIDO OBTENER EL NOMBRE. ")
-                + ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(tr.in(in, "NO SE HA PODIDO OBTENER EL NOMBRE. ")
+                , ok.txt);
+            ok.setTxt(ok.getTxt(), e);
             retorno = null;
         }
         return retorno;

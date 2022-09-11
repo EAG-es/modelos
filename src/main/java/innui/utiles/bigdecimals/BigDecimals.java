@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package inclui.utiles.bigdecimals;
+package innui.utiles.bigdecimals;
 
+import innui.bases;
 import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.errores.oks;
 import innui.modelos.internacionalizacion.tr;
@@ -17,7 +18,7 @@ import java.util.ResourceBundle;
  *
  * @author emilio
  */
-public class BigDecimals {
+public class BigDecimals extends bases {
     public static String k_in_ruta = "in/innui/utiles/bigdecimals/in";
     /**
      * Quita decimales a un número
@@ -31,24 +32,6 @@ public class BigDecimals {
     public static BigDecimal quitar_decimales(BigDecimal bigDecimal, int decimales_a_quitar, oks ok, Object ... extra_array) throws Exception {
         try {
             if (ok.es == false) { return null; }
-            return quitar_decimales(bigDecimal, decimales_a_quitar, RoundingMode.HALF_UP, ok, extra_array);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-    /**
-     * Quita decimales a un número
-     * @param bigDecimal Número al que quitar decimales
-     * @param decimales_a_quitar Cuantos decimales a quitar
-     * @param roundingMode Modo de redondeo (HALF_UP recomendado)
-     * @param ok Comunicar resultados
-     * @param extra_array Opción de añadir parámetros en el futuro.
-     * @return El número con decimales quitados.
-     * @throws Exception Opción de notificar errores de excepción
-     */
-    public static BigDecimal quitar_decimales(BigDecimal bigDecimal, int decimales_a_quitar, RoundingMode roundingMode, oks ok, Object ... extra_array) throws Exception {
-        try {
-            if (ok.es == false) { return null; }
             BigDecimal retorno;
             bigDecimal =  bigDecimal.stripTrailingZeros();
             BigDecimal [] bigDecimal_array = bigDecimal.divideAndRemainder(BigDecimal.ONE);
@@ -56,11 +39,10 @@ public class BigDecimals {
             String decimales_txt = bigDecimal_array[1].toPlainString();
             int decimales_num = decimales_txt.length() - 2; // "0."
             decimales_num = decimales_num - decimales_a_quitar;
-            if (decimales_num > 0) {
+            if (decimales_num >= 0) {
                 BigDecimal nuevo_divisor = BigDecimal.valueOf(1, decimales_num);
                 bigDecimal_array = bigDecimal.divideAndRemainder(nuevo_divisor);
-                MathContext mathContext = new MathContext(decimales_num, RoundingMode.HALF_UP);
-                retorno = bigDecimal.subtract(bigDecimal_array[1], mathContext);
+                retorno = bigDecimal.subtract(bigDecimal_array[1]);
                 retorno =  retorno.stripTrailingZeros();
             } else {
                 retorno = bigDecimal;
@@ -79,13 +61,14 @@ public class BigDecimals {
      * @return El resultado de la división o un valor cercano a Double.POSITIVE_INFINITY o Double.NEGATIVE_INFINITY
      * @throws Exception Opción de notificar errores de excepción
      */
+    @SuppressWarnings( "deprecation" )
     public static BigDecimal divide_0(BigDecimal dividendo, BigDecimal divisor, oks ok, Object ... extra_array) throws Exception {
         try {
             if (ok.es == false) { return null; }
             ResourceBundle in;
             in = ResourceBundles.getBundle(k_in_ruta);
             BigDecimal retorno = null;
-            if (divisor.toBigInteger().compareTo(BigInteger.ZERO) == 0) {
+            if (divisor.compareTo(BigDecimal.ZERO) == 0) {
                 ok.setTxt(tr.in(in, "División entre 0. "));
                 if (dividendo.compareTo(BigDecimal.ZERO) >= 0) {
                     if (divisor.compareTo(BigDecimal.ZERO) >= 0) {

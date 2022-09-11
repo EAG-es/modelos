@@ -11,7 +11,6 @@ import innui.modelos.errores.oks;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -97,24 +96,18 @@ public class ResourceBundles extends bases {
             } else {
                 ruta = crear_ruta_desde_clase(ResourceBundles.class, ruta_base, ok);
                 ok.es = (ruta != null);
-                if (ok.es) {
-                    file = new File(ruta);
-                    if (file.exists()) {
-                        urls = new URL [] {file.getParentFile().toURI().toURL()};
-                        loader = new URLClassLoader(urls);
-                        resourceBundle = ResourceBundle.getBundle(nombre, locale, loader);
-                    } else {
-                        resourceBundle = ResourceBundle.getBundle(ruta_base, locale);
-                    }
+                if (ok.es == false) { return null; }
+                file = new File(ruta);
+                if (file.exists()) {
+                    urls = new URL [] {file.getParentFile().toURI().toURL()};
+                    loader = new URLClassLoader(urls);
+                    resourceBundle = ResourceBundle.getBundle(nombre, locale, loader);
+                } else {
+                    resourceBundle = ResourceBundle.getBundle(ruta_base, locale);
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
-            ok.txt = ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(e.getMessage(), e);
             resourceBundle = null;
         }
         return resourceBundle;
@@ -143,24 +136,18 @@ public class ResourceBundles extends bases {
             } else {
                 ruta = crear_ruta_desde_clase(ResourceBundles.class, ruta_base, ok);
                 ok.es = (ruta != null);
-                if (ok.es) {
-                    file = new File(ruta);
-                    if (file.exists()) {
-                        URL [] urls = new URL [] {file.getParentFile().toURI().toURL()};
-                        ClassLoader loader_local = new URLClassLoader(urls);
-                        resourceBundle = ResourceBundle.getBundle(nombre, locale, loader_local);
-                    } else {
-                        resourceBundle = ResourceBundle.getBundle(ruta_base, locale, loader);
-                    }
+                if (ok.es == false) { return null; }
+                file = new File(ruta);
+                if (file.exists()) {
+                    URL [] urls = new URL [] {file.getParentFile().toURI().toURL()};
+                    ClassLoader loader_local = new URLClassLoader(urls);
+                    resourceBundle = ResourceBundle.getBundle(nombre, locale, loader_local);
+                } else {
+                    resourceBundle = ResourceBundle.getBundle(ruta_base, locale, loader);
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
-            ok.txt = ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(e);
             resourceBundle = null;
         }
         return resourceBundle;
@@ -202,12 +189,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
-            ok.txt = ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(e);
             resourceBundle = null;
         }
         return resourceBundle;
@@ -256,12 +238,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
-            ok.txt = ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(e);
             resourceBundle = null;
         }
         return resourceBundle;
@@ -309,12 +286,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
-            ok.txt = ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(e);
             resourceBundle = null;
         }
         return resourceBundle;
@@ -354,12 +326,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
-            ok.txt = ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(e);
             resourceBundle = null;
         }
         return resourceBundle;
@@ -400,12 +367,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
-            ok.txt = ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(e);
             resourceBundle = null;
         }
         return resourceBundle;

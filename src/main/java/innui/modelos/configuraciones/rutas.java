@@ -12,7 +12,6 @@ import java.io.File;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 /**
@@ -20,7 +19,7 @@ import java.util.ResourceBundle;
  * @author emilio
  */
 public class rutas extends bases {
-    public static String k_in_ruta = "in/innui/modelos/configuracion/in";
+    public static String k_in_ruta = "in/innui/modelos/configuraciones/in";
     public static String k_no_jar = ResourceBundles.getBundle_ne(k_in_ruta).getString("LA CLASE NO ESTÁ EN UN ARCHIVO JAR. ");
     
     /**
@@ -51,14 +50,10 @@ public class rutas extends bases {
                     retorno = null;
                 }
             } catch (Exception e) {
-                ok.txt = e.getMessage();
-                if (ok.txt == null) {
-                    ok.txt = "";
-                }
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.txt = tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO JAR. ")
-                    + ok.txt
-                    + " " + Arrays.asList(e.getStackTrace()).toString();
+                ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO JAR. ")
+                    , ok.txt);
+                ok.setTxt(ok.getTxt(), e);
                 retorno = null;
             }
             return retorno;
@@ -99,14 +94,10 @@ public class rutas extends bases {
             file = new File(retorno);
             retorno = file.getCanonicalPath();
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.txt = tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO RELATIVO AL CODIGO FUENTE. ")
-                + ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO RELATIVO AL CODIGO FUENTE. ")
+                , ok.txt);
+            ok.setTxt(ok.getTxt(), e);
             retorno = null;
         }
         return retorno;
@@ -127,35 +118,28 @@ public class rutas extends bases {
         try {
             file_padre = file.getParentFile();
             if (file_padre.exists() == false) {
-                ok.es = crear_rutas_padre(file_padre, ok);
-                if (ok.es) {
-                    file_abuelo = file_padre.getParentFile();
-                    ok.es = (file_abuelo != null);
+                crear_rutas_padre(file_padre, ok);
+                if (ok.es == false) { return false; }
+                file_abuelo = file_padre.getParentFile();
+                ok.no_nul(file_abuelo);
+                if (ok.es == false) { return false; }
+                if (file_abuelo.canWrite() == false) {
+                    ok.es = false;
+                    in = ResourceBundles.getBundle(k_in_ruta);
+                    ok.txt = tr.in(in, "NO HAY PERMISOS PARA CREAR EL DIRECTORIO: ") 
+                            + file_padre.getName()
+                            + tr.in(in, ", EN EL DIRECTORIO: ") 
+                            + file_abuelo.getCanonicalPath()
+                            + ". ";
                 }
-                if (ok.es) {
-                    if (file_abuelo.canWrite() == false) {
-                        ok.es = false;
-                        in = ResourceBundles.getBundle(k_in_ruta);
-                        ok.txt = tr.in(in, "NO HAY PERMISOS PARA CREAR EL DIRECTORIO: ") 
-                                + file_padre.getName()
-                                + tr.in(in, ", EN EL DIRECTORIO: ") 
-                                + file_abuelo.getCanonicalPath()
-                                + ". ";
-                    }
-                }
-                if (ok.es) {
-                    file_padre.mkdir();
-                }
+                if (ok.es == false) { return false; }
+                file_padre.mkdir();
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.txt = tr.in(in, "ERROR AL CREAR RUTAS PADRE. ")
-                + ok.txt
-                + " " + Arrays.asList(e.getStackTrace()).toString();
+            ok.setTxt(tr.in(in, "ERROR AL CREAR RUTAS PADRE. ")
+                , ok.txt);
+            ok.setTxt(ok.getTxt(), e);
             ok.es = false;
         }
         return ok.es;
