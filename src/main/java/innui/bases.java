@@ -94,6 +94,14 @@ public class bases implements i_formatos, i_escrituras {
     public Object getO() {
         return o;
     }
+
+    public void setMapa(Map<String, Object> mapa) {
+        this.mapa = mapa;
+    }
+    
+    public Map<String, Object> getMapa() {
+        return mapa;
+    }
     /**
      * Método formato que se puede sustituir para cambiar los formatos de presentación por defecto dado con su uso
      * @param id Identificador para facilitar el cambio de formato

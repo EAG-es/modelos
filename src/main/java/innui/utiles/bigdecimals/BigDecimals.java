@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 
 /**
@@ -53,7 +54,8 @@ public class BigDecimals extends bases {
         }
     }
     /**
-     * Divide comprobando la división entre 0 y retornando un valor cercano a Double.POSITIVE_INFINITY o Double.NEGATIVE_INFINITY según corresponda, si hay división por 0 (convertido a BigInteger)
+     * Divide comprobando la división entre 0 y retornando un valor cercano a Double.MAX_VALUE o -Double.MAX_VALUE según corresponda, si hay división por 0 (convertido a BigInteger)
+     * Si no se indica nada, opera con 8 decimales y HALF_UP
      * @param dividendo 
      * @param divisor
      * @param ok Comunicar resultados
@@ -85,7 +87,9 @@ public class BigDecimals extends bases {
                 }
             } else {
                 if (extra_array == null || extra_array.length == 0) {
-                    return dividendo.divide(divisor);
+                    MathContext mathContext;
+                    mathContext = new MathContext(8, RoundingMode.HALF_UP);
+                    return dividendo.divide(divisor, mathContext);
                 } else if (extra_array.length == 1) {
                     if (extra_array[0] instanceof MathContext) {
                         retorno = dividendo.divide(divisor, (MathContext) extra_array[0]);
