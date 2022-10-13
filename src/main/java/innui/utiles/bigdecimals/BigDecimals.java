@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 
 /**
@@ -22,11 +21,11 @@ import java.util.ResourceBundle;
 public class BigDecimals extends bases {
     public static String k_in_ruta = "in/innui/utiles/bigdecimals/in";
     /**
-     * Quita decimales a un número
+     * Quita decimales a un número (precision por máxima defecto 10 decimales y HALF_UP)
      * @param bigDecimal Número al que quitar decimales
-     * @param decimales_a_quitar Cuantos decimales a quitar
+     * @param decimales_a_quitar Cuantos decimales a quitar (desde atrás)
      * @param ok Comunicar resultados
-     * @param extra_array Opción de añadir parámetros en el futuro.
+     * @param extra_array Posición 0 = MathContext nueva precisión máxima por defecto. Resto opción de añadir parámetros en el futuro.
      * @return El número con decimales quitados.
      * @throws Exception Opción de notificar errores de excepción
      */
@@ -34,8 +33,77 @@ public class BigDecimals extends bases {
         try {
             if (ok.es == false) { return null; }
             BigDecimal retorno;
-            bigDecimal =  bigDecimal.stripTrailingZeros();
+            MathContext mathContext = null;
+            ResourceBundle in;
+            in = ResourceBundles.getBundle(k_in_ruta);
+            if (extra_array != null
+             && extra_array.length > 0) {
+                if (extra_array[0] instanceof MathContext) {
+                    mathContext = (MathContext) extra_array[0];
+                } else {
+                    ok.setTxt(tr.in(in, "El primer elemento opcional debe ser de la clase MathContext. "));
+                }
+            } else {
+                mathContext = new MathContext(10, RoundingMode.HALF_UP);
+            }
             BigDecimal [] bigDecimal_array = bigDecimal.divideAndRemainder(BigDecimal.ONE);
+            bigDecimal_array[1] = redondear(bigDecimal_array[1], mathContext, ok);
+            if (ok.es == false) { return null; }
+            bigDecimal_array[1] = bigDecimal_array[1].stripTrailingZeros();
+            String decimales_txt = bigDecimal_array[1].toPlainString();
+            int decimales_num = decimales_txt.length() - 2; // "0."
+            decimales_num = decimales_num - decimales_a_quitar;
+            if (decimales_num >= 0) {
+                BigDecimal nuevo_divisor = BigDecimal.valueOf(1, decimales_num);
+                bigDecimal_array = bigDecimal.divideAndRemainder(nuevo_divisor);                
+                retorno = bigDecimal.subtract(bigDecimal_array[1]);
+                retorno =  retorno.stripTrailingZeros();
+            } else if (decimales_num == 0) {
+                retorno = bigDecimal;
+            } else {
+                retorno = new BigDecimal(bigDecimal_array[1].toBigInteger());
+            }
+            return retorno;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    /**
+     * Quita decimales a un número redondeando (precision máxima por defecto 10 decimales y HALF_UP)
+     * @param bigDecimal Número al que quitar decimales
+     * @param decimales_a_quitar Cuantos decimales a quitar (desde atrás)
+     * @param roundingMode Modo de redondeo
+     * @param ok Comunicar resultados
+     * @param extra_array Posición 0 = MathContext nueva precisión máxima por defecto. Resto opción de añadir parámetros en el futuro.
+     * @return El número con decimales quitados.
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public static BigDecimal quitar_decimales_redondeando(BigDecimal bigDecimal
+            , int decimales_a_quitar
+            , RoundingMode roundingMode
+            , oks ok
+            , Object ... extra_array) throws Exception {
+        try {
+            if (ok.es == false) { return null; }
+            BigDecimal retorno = null;
+            BigDecimal resto = null;
+            BigDecimal resto_redondeado = null;
+            MathContext mathContext = null;
+            ResourceBundle in;
+            in = ResourceBundles.getBundle(k_in_ruta);
+            if (extra_array != null
+             && extra_array.length > 0) {
+                if (extra_array[0] instanceof MathContext) {
+                    mathContext = (MathContext) extra_array[0];
+                } else {
+                    ok.setTxt(tr.in(in, "El primer elemento opcional debe ser de la clase MathContext. "));
+                }
+            } else {
+                mathContext = new MathContext(10, RoundingMode.HALF_UP);
+            }
+            BigDecimal [] bigDecimal_array = bigDecimal.divideAndRemainder(BigDecimal.ONE);
+            bigDecimal_array[1] = redondear(bigDecimal_array[1], mathContext, ok);
+            if (ok.es == false) { return null; }
             bigDecimal_array[1] = bigDecimal_array[1].stripTrailingZeros();
             String decimales_txt = bigDecimal_array[1].toPlainString();
             int decimales_num = decimales_txt.length() - 2; // "0."
@@ -43,15 +111,73 @@ public class BigDecimals extends bases {
             if (decimales_num >= 0) {
                 BigDecimal nuevo_divisor = BigDecimal.valueOf(1, decimales_num);
                 bigDecimal_array = bigDecimal.divideAndRemainder(nuevo_divisor);
-                retorno = bigDecimal.subtract(bigDecimal_array[1]);
-                retorno =  retorno.stripTrailingZeros();
-            } else {
+                resto = bigDecimal_array[1];
+                retorno = bigDecimal.subtract(resto);
+                mathContext = new MathContext(decimales_num + 1, roundingMode);
+                resto_redondeado = redondear(resto, mathContext, ok);
+                if (ok.es == false) { return null; }
+                retorno = retorno.add(resto_redondeado);
+                retorno = retorno.stripTrailingZeros();
+            } else if (decimales_num == 0) {
                 retorno = bigDecimal;
+            } else {
+                retorno = redondear(bigDecimal_array[0], mathContext, ok);
             }
             return retorno;
         } catch (Exception e) {
             throw e;
         }
+    }
+    /**
+     * Redondea de una manera simplificada
+     * @param bigDecimal Número que redondear 
+     * @param mathContext Información para el redondeo
+     * @param ok Comunicar resultados
+     * @param extra_array Hasta 2 parámetros, según la división de BigDecimal que se desee hacer.
+     * @return El resultado de la división o un valor cercano a Double.POSITIVE_INFINITY o Double.NEGATIVE_INFINITY
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public static BigDecimal redondear(BigDecimal bigDecimal, MathContext mathContext, oks ok, Object ... extra_array) throws Exception {
+        BigDecimal retorno = null;
+        try {
+            if (ok.es == false) { return null; }
+//            BigDecimal entero;
+            int precision = mathContext.getPrecision();
+            if (precision > 0) {
+//                precision = precision - 1;
+                BigDecimal multiplicador = BigDecimal.valueOf(1, -precision);
+                retorno = bigDecimal.multiply(multiplicador, mathContext);
+//                try {
+//                    entero = new BigDecimal(retorno.toBigInteger());
+//                } catch (Exception e) {
+//                    entero = BigDecimal.valueOf(retorno.longValue());
+//                }
+//                BigDecimal parte_decimal = retorno.subtract(entero);
+//                if (parte_decimal.compareTo(BigDecimal.valueOf(0.1)) >= 0
+//                 || parte_decimal.compareTo(BigDecimal.valueOf(-0.1)) <= 0) {
+                    // no es 0 el primer decimal
+                    try {
+                        retorno = new BigDecimal(retorno.toBigInteger());
+                    } catch (Exception e) {
+                        retorno = BigDecimal.valueOf(retorno.longValue());
+                    }
+                    retorno = divide_0(retorno, BigDecimal.valueOf(10.0), ok, mathContext);
+                    if (ok.es == false) { return null; }
+                    retorno = retorno.setScale(0, mathContext.getRoundingMode());
+                    retorno = retorno.multiply(BigDecimal.valueOf(10.0), mathContext);
+//                } else {
+//                    retorno = entero;
+//                }
+                retorno = divide_0(retorno, multiplicador, ok, mathContext);
+                if (ok.es == false) { return null; }
+            } else {
+                retorno = bigDecimal;
+            }
+        
+        } catch (Exception e) {
+            throw e;
+        }
+        return retorno;
     }
     /**
      * Divide comprobando la división entre 0 y retornando un valor cercano a Double.MAX_VALUE o -Double.MAX_VALUE según corresponda, si hay división por 0 (convertido a BigInteger)
