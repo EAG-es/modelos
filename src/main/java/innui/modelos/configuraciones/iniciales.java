@@ -23,7 +23,18 @@ public abstract class iniciales extends bases {
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";  //NOI18N
     public Properties properties = null;
     
-    public boolean iniciar(Class<?> mainclass, oks ok, Object ... extra_array) throws Exception {
+    /**
+     * Este método debería ser llamado desde iniciar. 
+     * Realiza la configuración por defecto del logger, 
+     * instala las carpetas de recursos (k_ruta_relativa_recursos) y de internacionalización (k_ruta_relativa_internacionalizacion) fuera del jar, 
+     * lee el archivo de propiedades desde k_ruta_relativa_properties
+     * @param mainclass Clase desde donde localizar el origen de las rutas relativas.
+     * @param ok Comunicar resultados
+     * @param extras_array Opción de añadir parámetros en el futuro.
+     * @return true si todo va bien
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public boolean _iniciar_desde_clase(Class<?> mainclass, oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
             ResourceBundle in;
@@ -50,8 +61,14 @@ public abstract class iniciales extends bases {
             throw e; // Ayuda para la depuración
         }
     }
-
+    /**
+     * Método que se debería ejecutar después de iniciar.
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
     public abstract boolean run(oks ok, Object ... extra_array) throws Exception;
     
-    public abstract boolean iniciar_dependencias(oks ok, Object ... extra_array) throws Exception;
+    public abstract boolean iniciar(oks ok, Object ... extra_array) throws Exception;
 }

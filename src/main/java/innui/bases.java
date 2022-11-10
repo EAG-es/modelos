@@ -308,12 +308,21 @@ public class bases implements i_formatos, i_escrituras {
         if (nivel == null) {
             nivel = System.Logger.Level.INFO;
         }
-        if (_logger_limite.getSeverity() != System.Logger.Level.OFF.getSeverity()) {
-            if (_logger_limite.getSeverity() <= nivel.getSeverity()) {
-                _logger.log(nivel, texto);
-            }
+        if (ser_posible_log(nivel, ok)) {
+            _logger.log(nivel, texto);
         }
         return true;
+    }
+    /**
+     * Escribe una línea de texto INFO en la salida de log, si no se sustituye.
+     * @param texto Testo que escribir
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true si tiene éxito.
+     */
+    @Override
+    public boolean escribir_log(String texto, oks ok, Object... extras_array) {
+        return escribir_log(texto, null, ok, extras_array);
     }
     /**
      * Limita los mensaje de log que son registrados. OFF los quita todos, ALL los pone todos, etc...
@@ -332,5 +341,21 @@ public class bases implements i_formatos, i_escrituras {
         }
         _logger_limite = limite;
         return true;
+    }
+    /**
+     * Responde true si el nivel es posible que se registre, segun el nivel límite establecido
+     * @param limite Nivel de mensaje de log (puede ser null, entonces por defecto es quitar log: OFF)
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true el log se puede hacer para ese limite.
+     */
+    @Override
+    public boolean ser_posible_log(System.Logger.Level limite, oks ok, Object... extras_array) {
+        if (_logger_limite.getSeverity() != System.Logger.Level.OFF.getSeverity()) {
+            if (_logger_limite.getSeverity() <= limite.getSeverity()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

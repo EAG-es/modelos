@@ -46,7 +46,7 @@ public interface i_escrituras {
      */
     public boolean escribir_linea_error(String texto, oks ok, Object... extras_array);
     /**
-     * Escribe una línea de texto en la salida de error, si no se sustituye.
+     * Escribe una línea de texto en la salida de log, si no se sustituye.
      * @param texto Texto que escribir
      * @param nivel Nivel de mensaje de log
      * @param ok Comunicar resultados
@@ -55,6 +55,14 @@ public interface i_escrituras {
      */
     public boolean escribir_log(String texto, System.Logger.Level nivel, oks ok, Object... extras_array);
     /**
+     * Escribe una línea de texto INFO en la salida de log, si no se sustituye.
+     * @param texto Texto que escribir
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true si tiene éxito.
+     */
+    public boolean escribir_log(String texto, oks ok, Object... extras_array);
+    /**
      * Limita los mensaje de log que son registrados. OFF los quita todos, ALL los pone todos, etc...
      * @param limite Nivel de mensaje de log (puede ser null, entonces por defecto es quitar log: OFF)
      * @param ok Comunicar resultados
@@ -62,5 +70,13 @@ public interface i_escrituras {
      * @return true si tiene éxito.
      */
     public boolean limitar_log(System.Logger.Level limite, oks ok, Object... extras_array);
+    /**
+     * Responde true si el nivel es posible que se registre, segun el nivel límite establecido
+     * @param limite Nivel de mensaje de log (puede ser null, entonces por defecto es quitar log: OFF)
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true el log se puede hacer para ese limite.
+     */
+    public boolean ser_posible_log(System.Logger.Level limite, oks ok, Object... extras_array);
     
 }
