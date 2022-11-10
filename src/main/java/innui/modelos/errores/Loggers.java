@@ -216,9 +216,9 @@ public class Loggers extends SystemLogger_utils {
                 nombre = nombre + sufijo;
             }
             if (resourceBundleName == null) {
-                logger = getLogger(nombre).getLogger();
+                logger = SystemLogger_utils.getLogger(nombre).getLogger();
             } else {
-                logger = getLogger(nombre, resourceBundleName).getLogger();
+                logger = SystemLogger_utils.getLogger(nombre, resourceBundleName).getLogger();
             }
             if (logger.getUseParentHandlers()) {
                 ok.es = reconfigurar(logger, null, ok);
@@ -230,7 +230,7 @@ public class Loggers extends SystemLogger_utils {
                 throw new RuntimeException(ok.txt);
             }
         } catch (Exception e) {
-            
+            return null;
         }
         return loggers;
     }

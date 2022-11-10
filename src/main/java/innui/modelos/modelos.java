@@ -42,15 +42,15 @@ public class modelos extends iniciales {
     /**
      * Inicio de la aplicación desde un objeto instanciado
      * @param ok Comunicar resultados
-     * @param extra_array Opción de añadir parámetros en el futuro.
+     * @param extras_array Opción de añadir parámetros en el futuro.
      * @return true si todo va bien
      * @throws Exception Opción de notificar errores de excepción
      */
-    public boolean run(oks ok, Object ... extra_array) throws Exception {
+    public boolean run(oks ok, Object ... extras_array) throws Exception {
         try {
             while (true) {
                 if (ok.es == false) { break; }
-                iniciar_dependencias(ok);
+                iniciar(ok);
                 break;
             }
             oks ok_local = new oks();
@@ -62,9 +62,9 @@ public class modelos extends iniciales {
     }
 
     @Override
-    public boolean iniciar_dependencias(oks ok, Object... extra_array) throws Exception {
+    public boolean iniciar(oks ok, Object... extra_array) throws Exception {
         // Iniciar clase principal de la librería
-        iniciar(this.getClass(), ok);
+        _iniciar_desde_clase(this.getClass(), ok);
         return ok.es;
     }
     

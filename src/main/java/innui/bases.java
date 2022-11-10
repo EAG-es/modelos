@@ -21,6 +21,10 @@ public class bases implements i_formatos, i_escrituras {
     public static StringBuilder k_logger_nombre = new StringBuilder();
     public static String k_logger_nombre_por_defecto = "logger.log";
     /**
+     * Límite del nivel de log global por defecto
+     */
+    public static System.Logger.Level _logger_limite_global = System.Logger.Level.ALL;
+    /**
      * Atributo para extender el funcionamiento de una clase derivada de la clase: bases
      */
     public Object o = null;
@@ -49,7 +53,7 @@ public class bases implements i_formatos, i_escrituras {
      */
     public SystemLogger_utils _logger = null;
     /**
-     * Objeto de log por defeto
+     * Límite del nivel de log por defeto
      */
     public System.Logger.Level _logger_limite = System.Logger.Level.ALL;
     /**
@@ -308,12 +312,21 @@ public class bases implements i_formatos, i_escrituras {
         if (nivel == null) {
             nivel = System.Logger.Level.INFO;
         }
-        if (_logger_limite.getSeverity() != System.Logger.Level.OFF.getSeverity()) {
-            if (_logger_limite.getSeverity() <= nivel.getSeverity()) {
-                _logger.log(nivel, texto);
-            }
+        if (ser_posible_log(nivel, ok)) {
+            _logger.log(nivel, texto);
         }
         return true;
+    }
+    /**
+     * Escribe una línea de texto INFO en la salida de log, si no se sustituye.
+     * @param texto Testo que escribir
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true si tiene éxito.
+     */
+    @Override
+    public boolean escribir_log(String texto, oks ok, Object... extras_array) {
+        return escribir_log(texto, null, ok, extras_array);
     }
     /**
      * Limita los mensaje de log que son registrados. OFF los quita todos, ALL los pone todos, etc...
@@ -332,5 +345,40 @@ public class bases implements i_formatos, i_escrituras {
         }
         _logger_limite = limite;
         return true;
+    }
+    /**
+     * Limita los mensaje de log que son registrados. OFF los quita todos, ALL los pone todos, etc...
+     * @param limite Nivel de mensaje de log (puede ser null, entonces por defecto es quitar log: OFF)
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true si tiene éxito.
+     */
+    public boolean limitar_log_global(System.Logger.Level limite, oks ok, Object... extras_array) {
+        if (this.escritura != null) {
+            return this.escritura.limitar_log(limite, ok, extras_array);
+        }
+        if (limite == null) {
+            _logger_limite_global = System.Logger.Level.OFF;
+        }
+        _logger_limite_global = limite;
+        return true;
+    }
+    /**
+     * Responde true si el nivel es posible que se registre, segun el nivel límite establecido
+     * @param limite Nivel de mensaje de log (puede ser null, entonces por defecto es quitar log: OFF)
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true el log se puede hacer para ese limite.
+     */
+    @Override
+    public boolean ser_posible_log(System.Logger.Level limite, oks ok, Object... extras_array) {
+        if (_logger_limite.getSeverity() != System.Logger.Level.OFF.getSeverity()
+         && _logger_limite_global.getSeverity() != System.Logger.Level.OFF.getSeverity()) {
+            if (_logger_limite.getSeverity() <= limite.getSeverity()
+             && _logger_limite_global.getSeverity() <= limite.getSeverity()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
