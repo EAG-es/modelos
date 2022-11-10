@@ -216,9 +216,9 @@ public class Loggers extends SystemLogger_utils {
                 nombre = nombre + sufijo;
             }
             if (resourceBundleName == null) {
-                logger = java.util.logging.Logger.getLogger(nombre);
+                logger = getLogger(nombre).getLogger();
             } else {
-                logger = java.util.logging.Logger.getLogger(nombre, resourceBundleName);
+                logger = getLogger(nombre, resourceBundleName).getLogger();
             }
             if (logger.getUseParentHandlers()) {
                 ok.es = reconfigurar(logger, null, ok);

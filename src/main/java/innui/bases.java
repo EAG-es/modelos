@@ -4,6 +4,7 @@
  */
 package innui;
 
+import innui.modelos.errores.SystemLogger_utils;
 import innui.modelos.errores.oks;
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -17,6 +18,8 @@ import innui.utiles.strings.i_formatos;
  * @author emilio
  */
 public class bases implements i_formatos, i_escrituras {
+    public static StringBuilder k_logger_nombre = new StringBuilder();
+    public static String k_logger_nombre_por_defecto = "logger.log";
     /**
      * Atributo para extender el funcionamiento de una clase derivada de la clase: bases
      */
@@ -41,6 +44,14 @@ public class bases implements i_formatos, i_escrituras {
      * Objeto de formato de número por defeto
      */
     public NumberFormat _numberFormat = null;
+    /**
+     * Objeto de log por defeto
+     */
+    public SystemLogger_utils _logger = null;
+    /**
+     * Objeto de log por defeto
+     */
+    public System.Logger.Level _logger_limite = System.Logger.Level.ALL;
     /**
      * Devuelve un objeto de la clase base, el indicado por el atributo base (si no es null), o el propio.
      * @return un objeto base
@@ -273,6 +284,53 @@ public class bases implements i_formatos, i_escrituras {
             return this.escritura.escribir_linea_error(texto, ok, extras_array);
         }
         System.err.println(texto);
+        return true;
+    }
+    /**
+     * Escribe una línea de texto en la salida de log, si no se sustituye.
+     * @param texto Testo que escribir
+     * @param nivel Nivel de mensaje de log (puede ser null, entonces por defecto es: INFO)
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true si tiene éxito.
+     */
+    @Override
+    public boolean escribir_log(String texto, System.Logger.Level nivel, oks ok, Object... extras_array) {
+        if (this.escritura != null) {
+            return this.escritura.escribir_log(texto, nivel, ok, extras_array);
+        }
+        if (_logger == null) {
+            if (k_logger_nombre.isEmpty()) {
+                k_logger_nombre.append(k_logger_nombre_por_defecto);
+            }
+            _logger = SystemLogger_utils.getLogger(k_logger_nombre.toString());
+        }
+        if (nivel == null) {
+            nivel = System.Logger.Level.INFO;
+        }
+        if (_logger_limite.getSeverity() != System.Logger.Level.OFF.getSeverity()) {
+            if (_logger_limite.getSeverity() <= nivel.getSeverity()) {
+                _logger.log(nivel, texto);
+            }
+        }
+        return true;
+    }
+    /**
+     * Limita los mensaje de log que son registrados. OFF los quita todos, ALL los pone todos, etc...
+     * @param limite Nivel de mensaje de log (puede ser null, entonces por defecto es quitar log: OFF)
+     * @param ok Comunicar resultados
+     * @param extras_array Parámetros para el formato
+     * @return true si tiene éxito.
+     */
+    @Override
+    public boolean limitar_log(System.Logger.Level limite, oks ok, Object... extras_array) {
+        if (this.escritura != null) {
+            return this.escritura.limitar_log(limite, ok, extras_array);
+        }
+        if (limite == null) {
+            _logger_limite = System.Logger.Level.OFF;
+        }
+        _logger_limite = limite;
         return true;
     }
 }

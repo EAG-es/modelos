@@ -5,7 +5,6 @@
  */
 package innui.modelos.errores;
 
-import innui.bases;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 import static innui.modelos.errores.Loggers.traducir;
@@ -15,11 +14,22 @@ import java.util.logging.Logger;
  *
  * @author emilio
  */
-public class SystemLogger_utils extends bases implements System.Logger {
+public class SystemLogger_utils implements System.Logger {
 
-    public static String k_in_ruta = "in/innui/modelos/errores/in";
     public java.util.logging.Logger logger;
 
+    public static SystemLogger_utils getLogger(String nombre) {
+        SystemLogger_utils systemLogger_utils = new SystemLogger_utils();
+        systemLogger_utils.logger = java.util.logging.Logger.getLogger(nombre);
+        return systemLogger_utils;
+    }
+
+    public static SystemLogger_utils getLogger(String nombre, String resourceBundleName) {
+        SystemLogger_utils systemLogger_utils = new SystemLogger_utils();
+        systemLogger_utils.logger = java.util.logging.Logger.getLogger(nombre, resourceBundleName);
+        return systemLogger_utils;
+    }
+    
     @Override
     public String getName() {
         return logger.getName();

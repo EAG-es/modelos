@@ -21,7 +21,6 @@ public abstract class iniciales extends bases {
     public static String k_ruta_relativa_internacionalizacion = "/in"; //NOI18N
     public static String k_ruta_relativa_properties = "/re/configuraciones.properties";  //NOI18N
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";  //NOI18N
-    public Loggers logger = null;
     public Properties properties = null;
     
     public boolean iniciar(Class<?> mainclass, oks ok, Object ... extra_array) throws Exception {
@@ -29,8 +28,10 @@ public abstract class iniciales extends bases {
             if (ok.es == false) { return false; }
             ResourceBundle in;
             in = ResourceBundles.getBundle(k_in_ruta);
-            logger = Loggers.getLogger(null);
-            ok.no_nul(logger, tr.in(in, "Logger nulo. "));
+            _logger = Loggers.getLogger(null);
+            bases.k_logger_nombre.setLength(0);
+            bases.k_logger_nombre.append(_logger.getName());
+            ok.no_nul(_logger, tr.in(in, "Logger nulo. "));
             if (ok.es == false) { return false; }
             jars.instalar_carpeta_fuera(mainclass
                     , k_ruta_relativa_recursos
