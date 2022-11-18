@@ -58,10 +58,11 @@ public class BigDecimals extends bases {
                 bigDecimal_array = bigDecimal.divideAndRemainder(nuevo_divisor);                
                 retorno = bigDecimal.subtract(bigDecimal_array[1]);
                 retorno =  retorno.stripTrailingZeros();
-            } else if (decimales_num == 0) {
-                retorno = bigDecimal;
-            } else {
-                retorno = new BigDecimal(bigDecimal_array[1].toBigInteger());
+            } else { // if (decimales_num == 0) {
+                retorno = new BigDecimal(bigDecimal.toBigInteger());
+                retorno = retorno.setScale(0);
+//            } else {
+//                retorno = new BigDecimal(bigDecimal_array[1].toBigInteger());
             }
             return retorno;
         } catch (Exception e) {
@@ -118,10 +119,11 @@ public class BigDecimals extends bases {
                 if (ok.es == false) { return null; }
                 retorno = retorno.add(resto_redondeado);
                 retorno = retorno.stripTrailingZeros();
-            } else if (decimales_num == 0) {
-                retorno = bigDecimal;
-            } else {
-                retorno = redondear(bigDecimal_array[0], mathContext, ok);
+            } else { // if (decimales_num == 0) {
+                retorno = new BigDecimal(bigDecimal.toBigInteger());
+                retorno = retorno.setScale(0);
+//            } else {
+//                retorno = redondear(bigDecimal_array[0], mathContext, ok);
             }
             return retorno;
         } catch (Exception e) {

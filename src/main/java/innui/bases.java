@@ -381,4 +381,13 @@ public class bases implements i_formatos, i_escrituras {
         }
         return false;
     }
+    /**
+     * Traduce un literal: ALL, TRACE, DEBUG, INFO, WARNING, ERROR, OUT
+     * A su equivalente enumerado de nivel de log
+     * @param nombre_nivel_de_log Nombre del nivel de log
+     * @return El nivel de log correspondiente (o el de ALL, si no encaja con ninguno)
+     */
+    public System.Logger.Level traducir_nivel_de_log(String nombre_nivel_de_log) {
+        return SystemLogger_utils.traducir_nivel_de_log(nombre_nivel_de_log);
+    }
 }

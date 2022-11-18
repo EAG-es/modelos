@@ -64,10 +64,12 @@ public class Threads extends Thread {
      */
     public static boolean sleep(long milisegundos, oks ok) {
         try {
+            if (ok.es == false) { return ok.es; }
             Thread.sleep(milisegundos);
             return ok.es;
         } catch (ConcurrentModificationException 
-                | InterruptedException e_ignorar) {            
+                | InterruptedException e) {
+            ok.setTxt(e);
             return ok.es;
         } catch (Exception e) {
             ok.setTxt(e);

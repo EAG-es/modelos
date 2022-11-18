@@ -17,17 +17,50 @@ import java.util.logging.Logger;
 public class SystemLogger_utils implements System.Logger {
 
     public java.util.logging.Logger logger;
-
+    /**
+     * Obtiene un logger con el nombre indicado
+     * @param nombre Nombre del logger qeu obtener
+     * @return Un nuevo objeto SystemLogger_utils.
+     */
     public static SystemLogger_utils getLogger(String nombre) {
         SystemLogger_utils systemLogger_utils = new SystemLogger_utils();
         systemLogger_utils.logger = java.util.logging.Logger.getLogger(nombre);
         return systemLogger_utils;
     }
-
+    /**
+     * Obtiene un logger con el nombre indicado
+     * @param nombre Nombre del logger qeu obtener
+     * @param resourceBundleName Nombre del archivo de propiedades con los recursos de traducción
+     * @return Un nuevo objeto SystemLogger_utils.
+     */
     public static SystemLogger_utils getLogger(String nombre, String resourceBundleName) {
         SystemLogger_utils systemLogger_utils = new SystemLogger_utils();
         systemLogger_utils.logger = java.util.logging.Logger.getLogger(nombre, resourceBundleName);
         return systemLogger_utils;
+    }
+    /**
+     * Traduce un literal: ALL, TRACE, DEBUG, INFO, WARNING, ERROR, OUT
+     * A su equivalente enumerado de nivel de log
+     * @param nombre_nivel_de_log Nombre del nivel de log
+     * @return El nivel de log correspondiente (o el de ALL, si no encaja con ninguno)
+     */
+    public static System.Logger.Level traducir_nivel_de_log(String nombre_nivel_de_log) {
+        if (nombre_nivel_de_log.equals(System.Logger.Level.ALL.name())) {
+            return System.Logger.Level.ALL;
+        } else if (nombre_nivel_de_log.equals(System.Logger.Level.TRACE.name())) {
+            return System.Logger.Level.TRACE;
+        } else if (nombre_nivel_de_log.equals(System.Logger.Level.DEBUG.name())) {
+            return System.Logger.Level.DEBUG;
+        } else if (nombre_nivel_de_log.equals(System.Logger.Level.INFO.name())) {
+            return System.Logger.Level.INFO;
+        } else if (nombre_nivel_de_log.equals(System.Logger.Level.WARNING.name())) {
+            return System.Logger.Level.WARNING;
+        } else if (nombre_nivel_de_log.equals(System.Logger.Level.ERROR.name())) {
+            return System.Logger.Level.ERROR;
+        } else if (nombre_nivel_de_log.equals(System.Logger.Level.OFF.name())) {
+            return System.Logger.Level.OFF;
+        }
+        return System.Logger.Level.ALL;
     }
     
     @Override

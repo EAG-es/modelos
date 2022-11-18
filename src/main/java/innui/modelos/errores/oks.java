@@ -260,7 +260,7 @@ public class oks extends bases {
     /**
      * Evalua si el parámetro no es nulo
      * @param o objeto que evaluar
-     * @return true si o no es nulo, false si o es nulo
+     * @return true si no es nulo, false si es nulo
      * @param extra_array Opción de añadir parámetros en el futuro.
      * @throws Exception Opción de notificar errores de excepción
      */
