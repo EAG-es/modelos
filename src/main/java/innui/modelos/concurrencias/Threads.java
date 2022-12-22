@@ -7,7 +7,6 @@ package innui.modelos.concurrencias;
 import innui.modelos.errores.Loggers;
 import innui.modelos.errores.oks;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +19,7 @@ public class Threads extends Thread {
     public static String k_parar = "parar";
     public static String k_pausar = "pausar";
     public static String k_despausar = "despausar";
+    public static String k_interrumpido = "interrumpido";
     /**
      * Mapa preperado para el paso de datos en concurrencia.
      */
@@ -67,8 +67,8 @@ public class Threads extends Thread {
             if (ok.es == false) { return ok.es; }
             Thread.sleep(milisegundos);
             return ok.es;
-        } catch (ConcurrentModificationException 
-                | InterruptedException e) {
+        } catch (InterruptedException e) {
+            ok.id = k_interrumpido;
             ok.setTxt(e);
             return ok.es;
         } catch (Exception e) {
