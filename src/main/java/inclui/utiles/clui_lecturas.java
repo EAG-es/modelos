@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.util.InputMismatchException;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
@@ -21,6 +22,7 @@ import java.util.Scanner;
  */
 public class clui_lecturas extends bases {
     public static String k_in_ruta = "in/inclui/utiles/in";
+    public static String k_formato_incorrecto = "formato_incorrecto";
     public BufferedReader _bufferedReader = null;
     public Scanner _scanner = null;
     public InputStream _anterior_inputStream = null;
@@ -95,9 +97,53 @@ public class clui_lecturas extends bases {
     public InputStream reponer_entrada_estandar(oks ok, Object ... extra_array) throws Exception {
         try {
             InputStream inputStream = System.in;
-            System.setIn(_anterior_inputStream);
+            if (_anterior_inputStream != null) {
+                System.setIn(_anterior_inputStream);
+            }
             iniciar(ok);
             return inputStream;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    /**
+     * Lee una hasta el primer espacio en blanco
+     * @param ok Comunicar resultados
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
+     * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
+     * @return true si todo va bien
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public String leer_hasta_blanco(oks ok, Object ... extra_array) throws Exception {
+        try {
+            if (ok.es == false) { return null; }
+            String linea = null;
+            ResourceBundle in = null;
+            in = ResourceBundles.getBundle(k_in_ruta);
+            try {
+                if (extra_array.length > 0) {
+                    if ((Boolean) extra_array[0]) {
+                        while (_bufferedReader.ready()) {
+                            _bufferedReader.skip(1);
+                        }
+                    }
+                }
+                if (_scanner.hasNext("\\S*")) {
+                    linea = _scanner.next("\\S*");
+                }
+                if (extra_array.length > 1) {
+                    if ((Boolean) extra_array[1]) {
+                        while (_bufferedReader.ready()) {
+                            _bufferedReader.skip(1);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                ok.setTxt(e.getMessage(), tr.in(in, "Excepción leyendo hasta espacio en blanco. "));
+                linea = null;
+            }
+            return linea;
         } catch (Exception e) {
             throw e;
         }
@@ -173,6 +219,11 @@ public class clui_lecturas extends bases {
                     }
                 }
             }
+        } catch (InputMismatchException e) {
+            leer_hasta_blanco(ok);
+            ok.id = k_formato_incorrecto;
+            ok.setTxt(tr.in(in, "Excepción leyendo bigdecimal. "), e);
+            bigDecimal = null;
         } catch (Exception e) {
             ok.setTxt(tr.in(in, "Excepción leyendo bigdecimal. "), e);
             bigDecimal = null;

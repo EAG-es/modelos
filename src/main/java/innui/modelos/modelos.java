@@ -48,13 +48,8 @@ public class modelos extends iniciales {
      */
     public boolean run(oks ok, Object ... extras_array) throws Exception {
         try {
-            while (true) {
-                if (ok.es == false) { break; }
-                iniciar(ok);
-                break;
-            }
-            oks ok_local = new oks();
-            ok.setTxt(ok.getTxt(), ok_local.getTxt());
+            if (ok.es == false) { return ok.es; }
+            iniciar(ok);
             return ok.es;
         } catch (Exception e) {
             throw e;

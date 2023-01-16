@@ -8,6 +8,7 @@ import innui.bases;
 import innui.modelos.errores.Loggers;
 import innui.modelos.errores.oks;
 import innui.modelos.internacionalizacion.tr;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -19,7 +20,8 @@ import java.util.ResourceBundle;
 public abstract class iniciales extends bases {
     public static String k_ruta_relativa_recursos = "/re"; //NOI18N
     public static String k_ruta_relativa_internacionalizacion = "/in"; //NOI18N
-    public static String k_ruta_relativa_properties = "/re/configuraciones.properties";  //NOI18N
+    public static String k_extension_properties = ".properties";
+    public static String k_ruta_relativa_properties = "/re/configuraciones" + k_extension_properties;  //NOI18N
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";  //NOI18N
     public Properties properties = null;
     
@@ -54,7 +56,15 @@ public abstract class iniciales extends bases {
             if (ok.es == false) { return false; }
             properties = new Properties();
             // load a properties file
-            InputStream inputStream = mainclass.getResourceAsStream(k_ruta_relativa_properties);
+            String ruta_properties;
+            ruta_properties = mainclass.getPackageName();
+            File file = new File(k_ruta_relativa_recursos, ruta_properties + k_extension_properties);
+            if (file != null) {
+                ruta_properties = file.getCanonicalPath();
+            } else {
+                ruta_properties = k_ruta_relativa_properties;
+            }
+            InputStream inputStream = mainclass.getResourceAsStream(ruta_properties);
             properties.load(inputStream);
             return ok.es;
         } catch (Exception e) {
