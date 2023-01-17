@@ -64,7 +64,7 @@ public abstract class iniciales extends bases {
             } else {
                 ruta_properties = k_ruta_relativa_properties;
             }
-            InputStream inputStream = mainclass.getResourceAsStream(ruta_properties);
+            InputStream inputStream = Resources.getResourceAsStream(mainclass, ruta_properties);
             properties.load(inputStream);
             return ok.es;
         } catch (Exception e) {
