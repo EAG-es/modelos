@@ -131,5 +131,12 @@ public class modelos extends iniciales {
         _iniciar_desde_clase(this.getClass(), ok);
         return ok.es;
     }
+
+    @Override
+    public boolean terminar(oks ok, Object... extra_array) throws Exception {
+        // Terminar clase principal de la librería
+        _terminar_desde_clase(this.getClass(), ok);
+        return ok.es;
+    }
     
 }

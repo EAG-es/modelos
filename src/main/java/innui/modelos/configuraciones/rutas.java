@@ -12,6 +12,7 @@ import java.io.File;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -21,7 +22,33 @@ import java.util.ResourceBundle;
 public class rutas extends bases {
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";
     public static String k_no_jar = ResourceBundles.getBundle_ne(k_in_ruta).getString("LA CLASE NO ESTÁ EN UN ARCHIVO JAR. ");
-    
+
+    /**
+     * Crea una ruta uniendo la ruta base de la clase a la ruta relativa pasada como parametro
+     * @param clase Clase de la que obtener la ruta fuente de la clase.
+     * @param ok Comunicar resultados
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     * @return true si todo va bien
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public static File leer_ruta_de_clase(Class<?> clase, oks ok, Object ... extra_array) throws Exception {
+        if (ok.es == false) { return null; }
+        File file = null;
+        ResourceBundle in;
+        try {
+            URL url;
+            ProtectionDomain protectionDomain = clase.getProtectionDomain();
+            CodeSource codeSource = protectionDomain.getCodeSource();
+            url = codeSource.getLocation();
+            file = new File(url.toURI());
+        } catch (Exception e) {
+            in = ResourceBundles.getBundle(k_in_ruta);
+            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO JAR. ")
+                , e);
+            file = null;
+        }
+        return file;
+    }
     /**
      * Crea una ruta uniendo la ruta base de la clase a la ruta relativa pasada como parametro
      * @param clase Clase de la que obtener la ruta fuente de la clase.
@@ -31,35 +58,28 @@ public class rutas extends bases {
      * @throws Exception Opción de notificar errores de excepción
      */
     public static String leer_ruta_jar_desde_clase(Class<?> clase, oks ok, Object ... extra_array) throws Exception {
+        if (ok.es == false) { return null; }
+        String retorno = null;
+        ResourceBundle in;
+        File file;
         try {
+            file = leer_ruta_de_clase(clase, ok);
             if (ok.es == false) { return null; }
-            String retorno = null;
-            ResourceBundle in;
-            File file;
-            URL url;
-            try {
-                ProtectionDomain protectionDomain = clase.getProtectionDomain();
-                CodeSource codeSource = protectionDomain.getCodeSource();
-                url = codeSource.getLocation();
-                file = new File(url.toURI());
+            retorno = file.getPath();
+            if (retorno.toLowerCase().endsWith(".jar")) {
                 retorno = file.getPath();
-                if (retorno.toLowerCase().endsWith(".jar")) {
-                    retorno = file.getPath();
-                } else {
-                    ok.txt = k_no_jar;
-                    retorno = null;
-                }
-            } catch (Exception e) {
-                in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO JAR. ")
-                    , ok.txt);
-                ok.setTxt(ok.getTxt(), e);
+            } else {
+                ok.txt = k_no_jar;
                 retorno = null;
             }
-            return retorno;
         } catch (Exception e) {
-            throw e; // Ayuda para la depuración
+            in = ResourceBundles.getBundle(k_in_ruta);
+            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO JAR. ")
+                , ok.txt);
+            ok.setTxt(ok.getTxt(), e);
+            retorno = null;
         }
+        return retorno;
     }
     /**
      * Crea una ruta uniendo la ruta base de la clase a la ruta relativa pasada como parametro
@@ -141,6 +161,64 @@ public class rutas extends bases {
                 , ok.txt);
             ok.setTxt(ok.getTxt(), e);
             ok.es = false;
+        }
+        return ok.es;
+    }
+    /**
+     * Lista el contenido de una carpeta
+     * @param clase Clase contnida en el archivo jar
+     * @param contenido_lista Lista con el contenido del jar
+     * @param ok Comunicar resultados
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     * @return true si todo va bien
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public static boolean listar_contenido_de_ruta(Class<?> clase, List<String> contenido_lista, oks ok, Object ... extra_array) throws Exception {
+        if (ok.es == false) { return false; }
+        ResourceBundle in;
+        try {
+            File file;
+            file = rutas.leer_ruta_de_clase(clase, ok);
+            if (ok.es == false) { return false; }
+            if (file.isDirectory()) {
+                listar_contenido_de_ruta(file, contenido_lista, ok, extra_array);
+            } else {
+                contenido_lista.add(file.getCanonicalPath());
+            }
+        } catch (Exception e) {
+            in = ResourceBundles.getBundle(k_in_ruta);
+            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL LISTAR EL CONTENIDO DE UNA RUTA. "), e);
+        }
+        return ok.es;
+    }
+    /**
+     * Lista el contenido de una carpeta recursivamente
+     * @param carpeta Carpeta que listar
+     * @param contenido_lista Lista con el contenido del jar
+     * @param ok Comunicar resultados
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     * @return true si todo va bien
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public static boolean listar_contenido_de_ruta(File carpeta, List<String> contenido_lista, oks ok, Object ... extra_array) throws Exception {
+        if (ok.es == false) { return false; }
+        ResourceBundle in;
+        try {
+            if (ok.es == false) { return false; }
+            if (carpeta.isDirectory()) {
+                File [] files_array = carpeta.listFiles();
+                for (File nodo_file: files_array) {
+                    if (nodo_file.isDirectory()) {
+                        listar_contenido_de_ruta(nodo_file, contenido_lista, ok, extra_array);                        
+                        if (ok.es == false) { return false; }
+                    } else {
+                        contenido_lista.add(nodo_file.getCanonicalPath());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            in = ResourceBundles.getBundle(k_in_ruta);
+            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL LISTAR EL CONTENIDO DE UNA RUTA. "), e);
         }
         return ok.es;
     }

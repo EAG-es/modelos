@@ -28,7 +28,7 @@ import java.util.zip.ZipInputStream;
  *
  * @author emilio
  */
-public class jars extends bases {
+public class recursos_modificables extends bases {
 
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";
     /**
@@ -162,9 +162,11 @@ public class jars extends bases {
             ok.no_nul(ruta_absoluta_destino);
             if (ok.es == false) { return false; }
             file = new File(ruta_absoluta_destino);
-            ok.es = crear_rutas_padre(file, ok);
-            if (ok.es == false) { return false; }
-            ok.es = copiar_recurso(clase, ruta_origen_recurso, ruta_absoluta_destino, ok);
+            if (file.exists() == false) {
+                ok.es = crear_rutas_padre(file, ok);
+                if (ok.es == false) { return false; }
+                copiar_recurso(clase, ruta_origen_recurso, ruta_absoluta_destino, ok);
+            }
             return ok.es;
         } catch (Exception e) {
             throw e; // Ayuda para la depuración
@@ -184,7 +186,7 @@ public class jars extends bases {
             if (ok.es == false) { return false; }
             ResourceBundle in;
             List<String> contenido_lista = new ArrayList<>();
-            ok.es = listar_contenido_de_jar(clase, contenido_lista, ok);
+            listar_contenido_de_jar(clase, contenido_lista, ok);
             if (ok.es) {
                 if (ruta_origen_recurso.endsWith(File.separator) == false) {
                     ruta_origen_recurso=ruta_origen_recurso + File.separator;
@@ -264,15 +266,8 @@ public class jars extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.txt = e.getMessage();
-            if (ok.txt == null) {
-                ok.txt = "";
-            }
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL LISTAR EL CONTENIDO DE UN JAR. ")
-                , ok.txt);
-            ok.setTxt(ok.getTxt(), e);
-            ok.es = false;
+            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL LISTAR EL CONTENIDO DE UN JAR. "), e);
         }
         return ok.es;
     }

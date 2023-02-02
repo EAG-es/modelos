@@ -228,7 +228,15 @@ public class oks extends bases {
             setTxt(e);
         }
     }
-    
+    /**
+     * Establecer el texto del error.
+     * @param txt Texto que poner
+     * @param e Exceptión de la que obtener parte del texto del error.
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     */
+    public void setTxt(Exception e, String txt, Object ... extra_array) {
+        setTxt(txt, e, extra_array);
+    }
     /**
      * Establecer el texto del error.
      * @param e Exceptión de la que obtener parte del texto del error.
