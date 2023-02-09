@@ -14,6 +14,9 @@ import java.io.PrintStream;
  */
 public class oks extends bases {
     public static int k_gravedad_minima = 0;
+    public static int k_gravedad_baja = 2;
+    public static int k_gravedad_media = 5;
+    public static int k_gravedad_alta = 8;
     public static int k_gravedad_maxima = 10;
     /**
      * Separador que se utiliza en setTxt(Exception e, ...)

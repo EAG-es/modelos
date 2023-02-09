@@ -26,6 +26,7 @@ public abstract class iniciales extends bases {
     public static String k_extension_properties = ".properties";
     public static String k_ruta_relativa_properties = "/re/configuraciones" + k_extension_properties;  //NOI18N
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";  //NOI18N
+    public static String k_propiedad_duplicada = "propiedad_duplicada";
     public Properties properties = null;
     
     /**
@@ -75,6 +76,8 @@ public abstract class iniciales extends bases {
                 propertie.load(inputStream);
                 for (Entry<Object, Object> entry: propertie.entrySet()) {
                     if (properties.containsKey(entry.getKey())) {
+                        ok.id = k_propiedad_duplicada;
+                        ok.gravedad = oks.k_gravedad_baja;
                         ok.setTxt(tr.in(in, "Propiedad duplicada: ") + entry.getKey());
                         break;
                     }
