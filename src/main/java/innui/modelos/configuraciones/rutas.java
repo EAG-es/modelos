@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
  */
 public class rutas extends bases {
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";
-    public static String k_no_jar = ResourceBundles.getBundle_ne(k_in_ruta).getString("LA CLASE NO ESTÁ EN UN ARCHIVO JAR. ");
+    public static String k_no_jar = "LA CLASE NO ESTÁ EN UN ARCHIVO JAR. ";
 
     /**
      * Crea una ruta uniendo la ruta base de la clase a la ruta relativa pasada como parametro
@@ -40,11 +40,14 @@ public class rutas extends bases {
             ProtectionDomain protectionDomain = clase.getProtectionDomain();
             CodeSource codeSource = protectionDomain.getCodeSource();
             url = codeSource.getLocation();
-            file = new File(url.toURI());
+            try {
+                file = new File(url.toURI());
+            } catch (Exception e) {
+                ok.es = false;
+                return null;
+            }
         } catch (Exception e) {
-            in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO JAR. ")
-                , e);
+            ok.setTxt(e);
             file = null;
         }
         return file;
@@ -64,19 +67,21 @@ public class rutas extends bases {
         File file;
         try {
             file = leer_ruta_de_clase(clase, ok);
-            if (ok.es == false) { return null; }
+            if (ok.es == false) { 
+                ok.id = k_no_jar;
+                retorno = null;
+            }
             retorno = file.getPath();
             if (retorno.toLowerCase().endsWith(".jar")) {
                 retorno = file.getPath();
             } else {
-                ok.txt = k_no_jar;
+                in = ResourceBundles.getBundle(k_in_ruta);
+                ok.txt = tr.in(in, "LA CLASE NO ESTÁ EN UN ARCHIVO JAR. ");
+                ok.id = k_no_jar;
                 retorno = null;
             }
         } catch (Exception e) {
-            in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO JAR. ")
-                , ok.txt);
-            ok.setTxt(ok.getTxt(), e);
+            ok.setTxt(e);
             retorno = null;
         }
         return retorno;
@@ -100,7 +105,12 @@ public class rutas extends bases {
             ProtectionDomain protectionDomain = clase.getProtectionDomain();
             CodeSource codeSource = protectionDomain.getCodeSource();
             url = codeSource.getLocation();
-            file = new File(url.toURI());
+            try {
+                file = new File(url.toURI());
+            } catch (Exception e) {
+                ok.es = false;
+                return null;
+            }
             retorno = file.getPath();
             if (retorno.toLowerCase().endsWith(".jar")) {
                 retorno = file.getParent();
@@ -114,10 +124,7 @@ public class rutas extends bases {
             file = new File(retorno);
             retorno = file.getCanonicalPath();
         } catch (Exception e) {
-            in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "ERROR DE EXCEPCIÓN AL ENCONTRAR EL ARCHIVO RELATIVO AL CODIGO FUENTE. ")
-                , ok.txt);
-            ok.setTxt(ok.getTxt(), e);
+            ok.setTxt(e);
             retorno = null;
         }
         return retorno;

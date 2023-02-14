@@ -265,7 +265,7 @@ public class oks extends bases {
                 }
             }
         } catch (Exception ex) {
-            setTxt(e);
+            setTxt(ex);
         }
     }
     /**

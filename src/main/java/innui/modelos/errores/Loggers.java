@@ -157,7 +157,12 @@ public class Loggers extends SystemLogger_utils {
             ProtectionDomain protectionDomain = Loggers.class.getProtectionDomain();
             CodeSource codeSource = protectionDomain.getCodeSource();
             url = codeSource.getLocation();
-            file = new File(url.toURI());
+            try {
+                file = new File(url.toURI());
+            } catch (Exception e) {                
+                ok.es = false;
+                return null;
+            }
             retorno = file.getPath();
             if (retorno.toLowerCase().endsWith(".jar")) {
                 retorno = file.getParent();
@@ -171,10 +176,7 @@ public class Loggers extends SystemLogger_utils {
                 retorno = retorno + File.separator;
             }
         } catch (Exception e) {
-            in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "NO SE HA PODIDO OBTENER EL NOMBRE. ")
-                , ok.txt);
-            ok.setTxt(ok.getTxt(), e);
+            ok.setTxt(e);
             retorno = null;
         }
         return retorno;
@@ -202,14 +204,19 @@ public class Loggers extends SystemLogger_utils {
      * @param sufijo null para utilizar el nombre por defecto. O un sufijo que añadir al nombre del logger.
      * @param resourceBundleName Nombre con los recursos que utilizar.
      * @return null si hay error, un Logger si no lo hay.
+     * @throws java.lang.Exception
      */
-    public static Loggers getLogger(String sufijo, String resourceBundleName) {
+    public static Loggers getLogger(String sufijo, String resourceBundleName) throws Exception {
         oks ok = new oks();
         java.util.logging.Logger logger = null;
         String nombre;
         Loggers loggers = null;
         try {
             nombre = Loggers.obtener_nombre_por_defecto(ok);
+            if (nombre == null) {
+                ok.iniciar();
+                nombre = "";
+            }
             if (sufijo == null || sufijo.isBlank()) {
                 nombre = nombre + "error.log";
             } else {
@@ -230,7 +237,7 @@ public class Loggers extends SystemLogger_utils {
                 throw new RuntimeException(ok.txt);
             }
         } catch (Exception e) {
-            return null;
+            throw e;
         }
         return loggers;
     }
@@ -239,7 +246,7 @@ public class Loggers extends SystemLogger_utils {
      * @param sufijo null para utilizar el nombre por defecto. O un sufijo que añadir al nombre del logger.
      * @return null si hay error, un Logger si no lo hay.
      */
-    public static Loggers getLogger(String sufijo) {
+    public static Loggers getLogger(String sufijo) throws Exception {
         Loggers loggers = Loggers.getLogger(sufijo, null);
         return loggers;
     }

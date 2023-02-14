@@ -22,7 +22,7 @@ public class SystemLogger_utils implements System.Logger {
      * @param nombre Nombre del logger qeu obtener
      * @return Un nuevo objeto SystemLogger_utils.
      */
-    public static SystemLogger_utils getLogger(String nombre) {
+    public static SystemLogger_utils getLogger(String nombre) throws Exception {
         SystemLogger_utils systemLogger_utils = new SystemLogger_utils();
         systemLogger_utils.logger = java.util.logging.Logger.getLogger(nombre);
         return systemLogger_utils;
@@ -33,7 +33,7 @@ public class SystemLogger_utils implements System.Logger {
      * @param resourceBundleName Nombre del archivo de propiedades con los recursos de traducción
      * @return Un nuevo objeto SystemLogger_utils.
      */
-    public static SystemLogger_utils getLogger(String nombre, String resourceBundleName) {
+    public static SystemLogger_utils getLogger(String nombre, String resourceBundleName) throws Exception {
         SystemLogger_utils systemLogger_utils = new SystemLogger_utils();
         systemLogger_utils.logger = java.util.logging.Logger.getLogger(nombre, resourceBundleName);
         return systemLogger_utils;
@@ -121,7 +121,7 @@ public class SystemLogger_utils implements System.Logger {
         this.logger = logger;
     }
 
-    public static System.Logger.Level traducir(java.util.logging.Level level) {
+    public static System.Logger.Level traducir(java.util.logging.Level level) throws Exception {
         System.Logger.Level logger_level = System.Logger.Level.ALL;
         if (level == java.util.logging.Level.ALL) {
             logger_level = System.Logger.Level.ALL;

@@ -96,19 +96,22 @@ public class ResourceBundles extends bases {
             } else {
                 ruta = crear_ruta_desde_clase(ResourceBundles.class, ruta_base, ok);
                 ok.es = (ruta != null);
-                if (ok.es == false) { return null; }
-                file = new File(ruta);
-                if (file.exists()) {
-                    urls = new URL [] {file.getParentFile().toURI().toURL()};
-                    loader = new URLClassLoader(urls);
-                    resourceBundle = ResourceBundle.getBundle(nombre, locale, loader);
+                if (ok.es) {
+                    file = new File(ruta);
+                    if (file.exists()) {
+                        urls = new URL [] {file.getParentFile().toURI().toURL()};
+                        loader = new URLClassLoader(urls);
+                        resourceBundle = ResourceBundle.getBundle(nombre, locale, loader);
+                    } else {
+                        resourceBundle = ResourceBundle.getBundle(ruta_base, locale);
+                    }
                 } else {
                     resourceBundle = ResourceBundle.getBundle(ruta_base, locale);
                 }
+                ok.no_nul(resourceBundle);
             }
         } catch (Exception e) {
-            ok.setTxt(e.getMessage(), e);
-            resourceBundle = null;
+            throw e;
         }
         return resourceBundle;
     }
@@ -147,8 +150,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.setTxt(e);
-            resourceBundle = null;
+            throw e;
         }
         return resourceBundle;
     }
@@ -189,8 +191,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.setTxt(e);
-            resourceBundle = null;
+            throw e;
         }
         return resourceBundle;
     }
@@ -238,8 +239,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.setTxt(e);
-            resourceBundle = null;
+            throw e;
         }
         return resourceBundle;
     }
@@ -283,11 +283,13 @@ public class ResourceBundles extends bases {
                     } else {
                         resourceBundle = ResourceBundle.getBundle(ruta_base, control);
                     }
+                } else {
+                    resourceBundle = ResourceBundle.getBundle(ruta_base, control);
                 }
+                System.out.println("resourceBundle == null = " + (resourceBundle == null ));
             }
         } catch (Exception e) {
-            ok.setTxt(e);
-            resourceBundle = null;
+            throw e;
         }
         return resourceBundle;
     }
@@ -326,8 +328,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.setTxt(e);
-            resourceBundle = null;
+            throw e;
         }
         return resourceBundle;
     }
@@ -367,8 +368,7 @@ public class ResourceBundles extends bases {
                 }
             }
         } catch (Exception e) {
-            ok.setTxt(e);
-            resourceBundle = null;
+            throw e;
         }
         return resourceBundle;
     }

@@ -302,18 +302,24 @@ public class bases implements i_formatos, i_escrituras {
     public boolean escribir_log(String texto, System.Logger.Level nivel, oks ok, Object... extras_array) {
         if (this.escritura != null) {
             return this.escritura.escribir_log(texto, nivel, ok, extras_array);
-        }
-        if (_logger == null) {
-            if (k_logger_nombre.isEmpty()) {
-                k_logger_nombre.append(k_logger_nombre_por_defecto);
+        } else {
+            try {
+                if (_logger == null) {
+                    if (k_logger_nombre.isEmpty()) {
+                        k_logger_nombre.append(k_logger_nombre_por_defecto);
+                    }
+                    _logger = SystemLogger_utils.getLogger(k_logger_nombre.toString());
+                }
+                if (nivel == null) {
+                    nivel = System.Logger.Level.INFO;
+                }
+                if (ser_posible_log(nivel, ok)) {
+                    _logger.log(nivel, texto);
+                }
+            } catch (Exception e) {
+                ok.setTxt(e);
+                return false;
             }
-            _logger = SystemLogger_utils.getLogger(k_logger_nombre.toString());
-        }
-        if (nivel == null) {
-            nivel = System.Logger.Level.INFO;
-        }
-        if (ser_posible_log(nivel, ok)) {
-            _logger.log(nivel, texto);
         }
         return true;
     }

@@ -184,7 +184,6 @@ public class recursos_modificables extends bases {
     public static boolean instalar_carpeta_fuera(Class<?> clase, String ruta_origen_recurso, oks ok, Object ... extra_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
-            ResourceBundle in;
             List<String> contenido_lista = new ArrayList<>();
             listar_contenido_de_jar(clase, contenido_lista, ok);
             if (ok.es) {
@@ -199,8 +198,8 @@ public class recursos_modificables extends bases {
                         }
                     }
                 }
-            } else if (ok.txt.equals(k_no_jar)) {
-                ok.es = true;
+            } else if (ok.id.equals(k_no_jar)) {
+                ok.iniciar();
             }
             return ok.es;
         } catch (Exception e) {
