@@ -107,7 +107,7 @@ public class clui_lecturas extends bases {
         }
     }
     /**
-     * Lee una hasta el primer espacio en blanco
+     * Lee hasta el primer espacio en blanco
      * @param ok Comunicar resultados
      * @param extra_array Opción de añadir parámetros en el futuro.
      * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
