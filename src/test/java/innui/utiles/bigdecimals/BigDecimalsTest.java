@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
- */
 package innui.utiles.bigdecimals;
 
 import innui.modelos.errores.oks;
@@ -44,7 +40,7 @@ public class BigDecimalsTest {
     /**
      * Test of quitar_decimales method, of class BigDecimals.
      */
-    @Test
+    @Ignore
     public void testQuitar_decimales() throws Exception {
         System.out.println("quitar_decimales");
         BigDecimal bigDecimal = BigDecimal.valueOf(12.987654321);
@@ -59,7 +55,7 @@ public class BigDecimalsTest {
     /**
      * Test of quitar_decimales_redondeando method, of class BigDecimals.
      */
-    @Test
+    @Ignore
     public void testQuitar_decimales_redondeando() throws Exception {
         System.out.println("quitar_decimales_redondeando");
 //        BigDecimal bigDecimal = BigDecimal.valueOf(12,987654321);

@@ -29,10 +29,10 @@ public class oks extends bases {
     /**
      * Atributo para extender la funcionalidad reemplaando la que existe
      */
-    public boolean es = true;
+    public Boolean es = true;
     public String id = "";
     public String txt = "";
-    public int gravedad = k_gravedad_minima;
+    public Integer gravedad = k_gravedad_minima;
     /**
      * Pone a valor por defecto los atributos no estáticos
      * @return true si tiene éxito;
@@ -58,7 +58,7 @@ public class oks extends bases {
      * @return true si todo va bien
      * @throws Exception Opción de notificar errores de excepción
      */
-    public boolean isEs() throws Exception {
+    public Boolean isEs() throws Exception {
         try {
             if (o_es()) {
                 return ((oks)o()).isEs();
@@ -124,7 +124,7 @@ public class oks extends bases {
      * @return la gravedad del error.
      * @throws Exception Opción de notificar errores de excepción
      */
-    public int getGravedad() throws Exception {
+    public Integer getGravedad() throws Exception {
         try {
             if (o_es()) {
                 return ((oks)o()).getGravedad();
@@ -275,7 +275,7 @@ public class oks extends bases {
      * @param extra_array Opción de añadir parámetros en el futuro.
      * @throws Exception Opción de notificar errores de excepción
      */
-    public boolean no_nul(Object o, Object ... extra_array) throws Exception {
+    public Boolean no_nul(Object o, Object ... extra_array) throws Exception {
         try {
             es = (o != null);
             return es;
@@ -291,7 +291,7 @@ public class oks extends bases {
      * @return true si o no es nulo, false si o es nulo
      * @throws Exception Opción de notificar errores de excepción
      */
-    public boolean no_nul(Object o, String txt, Object ... extra_array) throws Exception {
+    public Boolean no_nul(Object o, String txt, Object ... extra_array) throws Exception {
         try {
             if (no_nul(o) == false) {
                 this.txt = txt;

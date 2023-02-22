@@ -1,14 +1,16 @@
 package innui.modelos.errores;
 
-import static inclui.formularios.entradas.k_in_base;
 import innui.bases;
 import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.internacionalizacion.tr;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
+import static inclui.formularios.entradas.k_in_ruta;
+import static innui.formularios.controles.k_in_ruta;
 
 public class patrones extends bases {
+    public static String k_in_ruta = "in/innui/modelos/errores/in";
 
     public static String k_patrones_iana_dominios_alto_nivel =
         "(?:"
@@ -276,7 +278,7 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
+                in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(dd/mm/aaaa | dd-mm-aaaa | dd.mm.aaaa)");
             }
         } catch (Exception e) {
@@ -300,7 +302,7 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
+                in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(dd/mm/aaaa | dd-mm-aaaa | dd.mm.aaaa) (hh:MM | hh:MM:ss)");
             }
         } catch (Exception e) {
@@ -324,7 +326,7 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
+                in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(hh:MM | hh:MM:ss)");
             }
         } catch (Exception e) {
@@ -348,7 +350,7 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
+                in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(hh:MM | hh:MM:ss)");
             }
         } catch (Exception e) {
@@ -372,7 +374,7 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
+                in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(hh:MM | hh:MM:ss)");
             }
         } catch (Exception e) {
@@ -396,8 +398,8 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
-                ok.setTxt(tr.in(in, "Error, no cumple con el formato: ") + "email");
+                in = ResourceBundles.getBundle(k_in_ruta);
+                ok.setTxt(tr.in(in, "Error, no cumple con el formato: ") + tr.in(in, "email"));
             }
         } catch (Exception e) {
             throw e;
@@ -420,8 +422,8 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
-                ok.setTxt(tr.in(in, "Error, no cumple con el formato: ") + "email");
+                in = ResourceBundles.getBundle(k_in_ruta);
+                ok.setTxt(tr.in(in, "Error, no cumple con el formato: ") + tr.in(in, "teléfono"));
             }
         } catch (Exception e) {
             throw e;
@@ -444,7 +446,7 @@ public class patrones extends bases {
             texto = texto.trim();
             ok.es = texto.matches(regex);
             if (ok.es == false) {
-                in = ResourceBundles.getBundle(k_in_base);
+                in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error, no cumple con la expresión regular: ") + regex);
             }
         } catch (Exception e) {
@@ -527,7 +529,7 @@ public class patrones extends bases {
             date_fecha = convertir_fecha(textos_array[0], ok);
             if (date_fecha == null) { return null; }
             Date date_hora;
-            date_hora = convertir_hora(textos_array[0], ok);
+            date_hora = convertir_hora(textos_array[1], ok);
             if (date_hora == null) { return null; }
             Long time;
             time = date_fecha.getTime();

@@ -151,7 +151,7 @@ public class bases implements i_formatos, i_escrituras {
     }
     /**
      * Método de formato de fecha y hora que se puede sustituir para cambiar los formatos de presentación por defecto dado con su uso
-     * @param id Identificador para facilitar el cambio de formato
+     * @param id Identificador para facilitar el cambio de formato (puede ser null)
      * @param date fecha a la que dar formato
      * @param ok Comunicar resultados
      * @param extras_array Parámetros para el formato

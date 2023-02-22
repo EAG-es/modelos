@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package innui.modelos;
 
 import innui.modelos.configuraciones.iniciales;
@@ -119,6 +115,9 @@ public class modelos extends iniciales {
         try {
             if (ok.es == false) { return ok.es; }
             iniciar(ok);
+            if (ok.es) {
+                terminar(ok);
+            }
             return ok.es;
         } catch (Exception e) {
             throw e;

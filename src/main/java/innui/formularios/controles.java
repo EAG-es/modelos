@@ -1,4 +1,4 @@
-package inclui.formularios;
+package innui.formularios;
 
 import innui.bases;
 import innui.modelos.errores.oks;
@@ -9,16 +9,13 @@ import java.util.Map;
  * @author emilio
  */
 public class controles extends bases {
-    public static String k_in_base = "in/inclui/formularios/in";
+    public static String k_in_ruta = "in/innui/formularios/in";
     public static String k_fase_captura = "fase_captura";
     public static String k_fase_procesamiento = "fase_procesamiento";
     public static String k_opciones_mapa_requerido = "requerido";
-    public static String k_opciones_mapa_patron_regex = "pattern";
-    public static String k_opciones_mapa_min = "min";
-    public static String k_opciones_mapa_max = "max";
     public formularios _formulario = null;
-    public Object valor_del_objeto = null;
-    public String nombre = null;
+    public Object valor = null;
+    public String clave = null;
     public String mensaje_de_captura = null;
     public Map<String, Object> opciones_mapa = null;
 
@@ -92,7 +89,7 @@ public class controles extends bases {
         } catch (Exception e) {
             throw e;
         }
-        return ok.es;
+        return "";
     }
     /**
      * Procesa la información capturada
@@ -113,7 +110,8 @@ public class controles extends bases {
         return ok.es;
     }
     /**
-     * Procesa la información capturada
+     * Procesa la información capturada.
+     * Controla el dato de opciones_mapa: k_opciones_mapa_requerido despues de validar.
      * @param modo_operacion
      * @param objeto_a_procesar puede ser nulo (si no es solo_procesa_control)
      * @param ok
@@ -138,8 +136,6 @@ public class controles extends bases {
                 }
                 object = _capturar(modo_operacion, object, ok, extras_array);
                 if (ok.es == false) { break; }
-                ok.no_nul(object);
-                if (ok.es == false) { break; }
                 if (_formulario._es_terminar) {
                     break;
                 }
@@ -147,33 +143,34 @@ public class controles extends bases {
                 if (ok.es == false) { 
                     oks ok_1 = new oks();
                     _formulario.escribir_linea_error(ok.getTxt(), ok_1);
-                    if (ok_1.es == false) { break; }
+                    if (ok_1.es == false) { 
+                        ok.setTxt(ok.getTxt());
+                        break; 
+                    }
                     continue; 
                 }
                 if (_formulario._es_terminar) {
                     break;
                 }
-                object = _convertir(modo_operacion, object, ok, extras_array);
-                if (ok.es == false) { break; }
                 if (opciones_mapa.containsKey(k_opciones_mapa_requerido)) {
                     if (object == null) {
                         continue;
                     } else if (object instanceof String) {
-                        if (((String) object).isBlank()) {
+                        if (object.toString().isBlank()) {
                             continue;
                         }
                     }
                 }
-                ok.no_nul(object);
+                object = _convertir(modo_operacion, object, ok, extras_array);
                 if (ok.es == false) { break; }
                 break;
             }
-            oks ok_final = new oks();
-            object = _terminar(modo_operacion, object, ok_final, extras_array);
-            ok.setTxt(ok.getTxt(), ok_final.getTxt());
-            if (ok.es == false) { return null; }
-            ok_final.no_nul(object);
-            if (ok_final.es == false) { return null; }
+            oks ok_1 = new oks();
+            object = _terminar(modo_operacion, object, ok_1, extras_array);            
+            if (ok_1.es == false) { 
+                ok.setTxt(ok_1.getTxt());
+                return null; 
+            }
         } catch (Exception e) {
             throw e;
         }
@@ -195,12 +192,12 @@ public class controles extends bases {
         } catch (Exception e) {
             throw e;
         }
-        return ok.es;
+        return objeto_a_terminar;
     }
     /**
      * Pone el control en un _formulario
      * @param formulario Formulario al que pertenecerá
-     * @param nombre Identificador del control
+     * @param clave Identificador del control
      * @param mensaje_de_captura Mensaje antes de la captura de datos del control
      * @param opciones_mapa Mapa con opciones adicionales para el control
      * @param ok
@@ -208,11 +205,11 @@ public class controles extends bases {
      * @return
      * @throws Exception 
      */
-    public boolean poner_en_formulario(formularios formulario, String nombre, String mensaje_de_captura, Map<String, Object> opciones_mapa, oks ok, Object ... extras_array) throws Exception {
+    public boolean poner_en_formulario(formularios formulario, String clave, String mensaje_de_captura, Map<String, Object> opciones_mapa, oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
             this._formulario = formulario;
-            this.nombre = nombre;
+            this.clave = clave;
             this.mensaje_de_captura = mensaje_de_captura;
             this.opciones_mapa = opciones_mapa;
             formulario._poner_control(this, ok, extras_array);            
@@ -223,19 +220,19 @@ public class controles extends bases {
     }
 
     public Object getValor_del_objeto() {
-        return valor_del_objeto;
+        return valor;
     }
 
     public void setValor_del_objeto(Object valor_del_objeto) {
-        this.valor_del_objeto = valor_del_objeto;
+        this.valor = valor_del_objeto;
     }
 
     public String getNombre() {
-        return nombre;
+        return clave;
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this.clave = nombre;
     }
         
 }

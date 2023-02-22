@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package inclui.utiles;
 
 import innui.bases;
@@ -45,7 +41,7 @@ public class clui_lecturas extends bases {
             if (ok.es == false) { return ok.es; }
             InputStreamReader inputStreamReader = new InputStreamReader(System.in);
             _bufferedReader = new BufferedReader(inputStreamReader);
-            _scanner = new Scanner(_bufferedReader);
+            iniciar(_bufferedReader, ok, extra_array);
             return ok.es;
         } catch (Exception e) {
             throw e;
@@ -149,6 +145,77 @@ public class clui_lecturas extends bases {
         }
     }
     /**
+     * Procesa una letra leída al leer una línea
+     * @param letra
+     * @param ok Comunicar resultados
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
+     * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
+     * @return true si todo va bien
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public Character leer_linea_a_letras_procesar_letra(Character letra, oks ok, Object ... extra_array) throws Exception {
+    /**
+     * Lee una línea
+     * @param ok Comunicar resultados
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
+     * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
+     * @return true si todo va bien
+     * @throws Exception Opción de notificar errores de excepción
+     */
+        try {
+            if (ok.es == false) { return null; }
+            return letra;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    
+    public String leer_linea_a_letras(oks ok, Object ... extra_array) throws Exception {
+        try {
+            if (ok.es == false) { return null; }
+            String linea = null;
+            ResourceBundle in = null;
+            in = ResourceBundles.getBundle(k_in_ruta);
+            char [] letra_array = new char[1];
+            try {
+                if (extra_array.length > 0) {
+                    if ((Boolean) extra_array[0]) {
+                        while (_bufferedReader.ready()) {
+                            _bufferedReader.skip(1);
+                        }
+                    }
+                }
+                linea = "";
+                while (true) {
+                    if (_bufferedReader.read(letra_array) == -1) {
+                        break;
+                    }
+                    letra_array[0] = leer_linea_a_letras_procesar_letra(letra_array[0], ok);
+                    if (ok.es == false) { break; }
+                    if (letra_array[0] == '\n') {
+                        break;
+                    }
+                    linea = linea + letra_array[0];
+                }
+                if (extra_array.length > 1) {
+                    if ((Boolean) extra_array[1]) {
+                        while (_bufferedReader.ready()) {
+                            _bufferedReader.skip(1);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                ok.setTxt(e.getMessage(), tr.in(in, "Excepción leyendo línea. "));
+                linea = null;
+            }
+            return linea;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    /**
      * Lee una línea
      * @param ok Comunicar resultados
      * @param extra_array Opción de añadir parámetros en el futuro.
@@ -172,7 +239,7 @@ public class clui_lecturas extends bases {
                     }
                 }
                 linea = _scanner.nextLine();
-//                linea = bufferedReader.readLine();
+//                linea = _bufferedReader.readLine();
                 if (extra_array.length > 1) {
                     if ((Boolean) extra_array[1]) {
                         while (_bufferedReader.ready()) {

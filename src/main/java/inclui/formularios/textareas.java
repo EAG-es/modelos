@@ -8,6 +8,7 @@ import innui.modelos.errores.oks;
  */
 public class textareas extends entradas {
     
+    @Override
     public boolean iniciar(String tipo_entrada, oks ok, Object ... extras_array) throws Exception {
         _entrada_tipo = k_entradas_tipo_texto;
         return ok.es;
@@ -36,7 +37,7 @@ public class textareas extends entradas {
      */
     @Override
     public Object _convertir(String modo_operacion, Object objeto_a_convertir, oks ok, Object ... extras_array) throws Exception {
-        return (String) objeto_a_convertir;
+        return objeto_a_convertir.toString();
     }
     /**
      * Procesa la información capturada
@@ -97,9 +98,11 @@ public class textareas extends entradas {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                 if (ok.es == false) { return false; }
-                String texto = (String) objeto_a_presentar;
+                String texto;
                 if (objeto_a_presentar == null) { 
                     texto = "";
+                } else {
+                    texto = objeto_a_presentar.toString();
                 }
             }            
         } catch (Exception e) {
