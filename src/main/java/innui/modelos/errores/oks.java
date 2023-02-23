@@ -54,6 +54,26 @@ public class oks extends bases {
         }
     }
     /**
+     * Pone a valor por defecto los atributos no estáticos
+     * @return true si tiene éxito;
+     * @throws Exception 
+     */
+    public oks iniciar(oks ok) throws Exception {
+        try {
+            if (o_es()) {
+                return ((oks)o()).iniciar();
+            } else {
+                es = ok.es;
+                id = ok.id;
+                txt = ok.txt;
+                gravedad = ok.gravedad;
+                return this;
+            }
+        } catch (Exception e) {
+            throw e; // Ayuda para la depuración
+        }
+    }
+    /**
      * Consultar si ok va bien
      * @return true si todo va bien
      * @throws Exception Opción de notificar errores de excepción

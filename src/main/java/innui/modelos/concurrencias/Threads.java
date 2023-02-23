@@ -19,15 +19,16 @@ public class Threads extends Thread {
     public static String k_parar = "parar";
     public static String k_pausar = "pausar";
     public static String k_despausar = "despausar";
+    public static String k_interrumpir = "interrumpir";
     public static String k_interrumpido = "interrumpido";
     /**
      * Mapa preperado para el paso de datos en concurrencia.
      */
     public Map<String, Object> mapa = Collections.synchronizedMap(new HashMap<>());
     /**
-     * Objeto oks que compartir concurrentemente (null por defecto)
+     * Objeto oks que compartir concurrentemente 
      */
-    public AtomicReference<oks> ref_ok = new AtomicReference<>();
+    public AtomicReference<oks> ref_ok = new AtomicReference<>(new oks());
     /**
      * Objeto Loggers que compartir concurrentemente (null por defecto)
      */
@@ -87,9 +88,29 @@ public class Threads extends Thread {
         try {
             Thread.sleep(milisegundos, nanosegundos);
             return ok.es;
+        } catch (InterruptedException e) {
+            ok.id = k_interrumpido;
+            ok.setTxt(e);
+            return ok.es;
         } catch (Exception e) {
             ok.setTxt(e);
             return ok.es;
         }
     }   
+    /**
+     * interrupt que no lanza excepción
+     * @param ok
+     * @return true si tiene éxito
+     */
+    public boolean interrupt(oks ok) {
+        try {
+            if (ok.es == false) { return ok.es; }
+            interrupt();
+            return ok.es;
+        } catch (Exception e) {
+            ok.setTxt(e);
+            return ok.es;
+        }
+    }   
+    
 }

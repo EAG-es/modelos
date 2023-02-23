@@ -6,7 +6,7 @@ import innui.modelos.internacionalizacion.tr;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
-import static inclui.formularios.entradas.k_in_ruta;
+import static inclui.formularios.control_entradas.k_in_ruta;
 import static innui.formularios.controles.k_in_ruta;
 
 public class patrones extends bases {

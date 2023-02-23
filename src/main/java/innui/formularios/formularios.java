@@ -165,7 +165,7 @@ public class formularios extends bases {
         return ok.es;
     }
     /** 
-     * Evita que se continúe con la captura del _formulario
+     * Cancela el _formulario
      * @param ok
      * @param extras_array
      * @return
