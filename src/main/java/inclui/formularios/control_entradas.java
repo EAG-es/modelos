@@ -3,13 +3,13 @@ package inclui.formularios;
 import innui.formularios.formularios;
 import innui.formularios.controles;
 import inclui.utiles.clui_lecturas;
+import static innui.formularios.formularios.k_fase_procesamiento;
 import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.errores.oks;
 import innui.modelos.errores.patrones;
 import static innui.modelos.errores.patrones.k_patrones_formato_fecha;
 import static innui.modelos.errores.patrones.k_patrones_formato_hora;
 import innui.modelos.internacionalizacion.tr;
-import java.io.Console;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -20,7 +20,7 @@ import java.util.ResourceBundle;
  *
  * @author emilio
  */
-public class entradas extends controles {
+public class control_entradas extends controles {
     public static String k_in_ruta = "in/inclui/formularios/in";
     public static String k_entradas_clui_lectura = "clui_lectura";
     public static String k_entradas_tipo_texto = "text";
@@ -43,26 +43,22 @@ public class entradas extends controles {
     public static String k_entradas_tipo_hidden = "hidden";
     public static String k_entradas_tipo_submit = "submit";
     public static String k_entradas_tipo_reset = "reset";
-    public static String k_entradas_tipo_imagen = "image";
+    public static String k_entradas_tipo_con_imagen = "image";
     public static String k_entradas_tipo_boton = "button";
     public static String k_entradas_tipo_checkbox = "checkbox";
     public static String k_entradas_tipo_radio = "radio";
     public static String k_entradas_tipo_cero = "0";
     public static String k_entradas_tipo_uno = "1";
     public static String k_entradas_codigo_cancelar = ".X.";
+    public static String k_entradas_codigo_borrar = ".0.";
     public static String k_entradas_patron_color = "#[0-9ABCDEF][0-9ABCDEF][0-9ABCDEF][0-9ABCDEF][0-9ABCDEF][0-9ABCDEF]";
     public static String k_entradas_formato_color = "#xxxxxx";
     public static String k_entradas_formato_duopcion = "0 | 1";
     public static String k_opciones_mapa_patron_regex = "pattern";
     public static String k_opciones_mapa_min = "min";
     public static String k_opciones_mapa_max = "max";
-    public String _entrada_tipo;
     public clui_lecturas _clui_lectura;
     
-    public boolean iniciar(String tipo_entrada, oks ok, Object ... extras_array) throws Exception {
-        _entrada_tipo = tipo_entrada;
-        return ok.es;
-    }
     /**
      * Valida un valor vacío, si hay valor por defecto
      * @param objeto_a_validar
@@ -78,7 +74,7 @@ public class entradas extends controles {
                 // Existe un valor por defecto
                 if (objeto_a_validar != null) {
                     if (objeto_a_validar instanceof String) {
-                        if (objeto_a_validar.toString().isBlank()) {
+                        if (objeto_a_validar.toString().isEmpty()) {
                             return true;
                         }
                     }
@@ -104,7 +100,7 @@ public class entradas extends controles {
             if (ok.es == false) { return false; }
             if (objeto_a_validar != null) {
                 if (objeto_a_validar instanceof String) {
-                    if (objeto_a_validar.toString().isBlank()) {
+                    if (objeto_a_validar.toString().isEmpty()) {
                         return true;
                     }
                 }
@@ -133,42 +129,58 @@ public class entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 if (utilizar_valor_por_defecto(objeto_a_validar, ok, extras_array)) {
                     return true;
-                } else if (ser_valor_vacio(objeto_a_validar, ok, extras_array)) {
-                    if (this.opciones_mapa.containsKey(k_opciones_mapa_requerido)) {
+                } else {
+                    if (objeto_a_validar != null) {
+                        String texto = objeto_a_validar.toString();
+                        if (texto.equals(k_entradas_codigo_borrar)) {
+                            objeto_a_validar = null;
+                        }
+                    }
+                }                    
+                if (ser_valor_vacio(objeto_a_validar, ok, extras_array)) {
+                    if (this.opciones_mapa.containsKey(k_opciones_mapa_no_requerido) == false) {
                         in = ResourceBundles.getBundle(k_in_ruta);
                         ok.setTxt(tr.in(in, "Debe introducir un valor. "));
                     } 
                     return ok.es;
                 }
-                if (_entrada_tipo.equals(k_entradas_tipo_ruta_archivo)) {
+                if (_control_tipo.equals(k_entradas_tipo_ruta_archivo)) {
                     return _validar_ruta_archivo(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_texto)
-                        || _entrada_tipo.equals(k_entradas_tipo_search)) {
-                    return _validar_texto(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_password)) {
-                    return _validar_texto(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_color)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_texto)
+                        || _control_tipo.equals(k_entradas_tipo_search)) {
+                    return _validar_texto_con_patron(objeto_a_validar, ok, extras_array);
+                } else if (_control_tipo.equals(k_entradas_tipo_password)) {
+                    return _validar_texto_con_patron(objeto_a_validar, ok, extras_array);
+                } else if (_control_tipo.equals(k_entradas_tipo_color)) {
                     return _validar_color(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_fecha)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_fecha)) {
                     return _validar_fecha(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_fecha_y_hora)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_fecha_y_hora)) {
                     return _validar_fecha_y_hora(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_email)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_email)) {
                     return _validar_email(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_mes)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_mes)) {
                     return _validar_mes(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_numero)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_numero)) {
                     return _validar_numero(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_rango)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_rango)) {
                     return _validar_rango(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_telefono)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_telefono)) {
                     return _validar_telefono(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_hora)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_hora)) {
                     return _validar_hora(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_url)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_url)) {
                     return _validar_url(objeto_a_validar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_semana)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_semana)) {
                     return _validar_semana(objeto_a_validar, ok, extras_array);
+                } else if (_control_tipo.equals(k_entradas_tipo_hidden)
+                        || _control_tipo.equals(k_entradas_tipo_submit)
+                        || _control_tipo.equals(k_entradas_tipo_reset)
+                        || _control_tipo.equals(k_entradas_tipo_boton)
+                        || _control_tipo.equals(k_entradas_tipo_checkbox)
+                        || _control_tipo.equals(k_entradas_tipo_radio)
+                        || _control_tipo.equals(k_entradas_tipo_con_imagen)) {
+                    return _validar_boton(objeto_a_validar, ok, extras_array);
                 }
             }
         } catch (Exception e) {
@@ -177,12 +189,30 @@ public class entradas extends controles {
         return ok.es;
     }
     
-    public boolean _validar_texto(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
+    public boolean _validar_texto_con_patron(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
             String regex = (String) opciones_mapa.get(k_opciones_mapa_patron_regex);
             if (regex != null) {
                 return patrones.validar_patron(objeto_a_validar.toString(), regex, ok);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return ok.es;
+    }
+    
+    public boolean _validar_boton(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
+        ResourceBundle in;
+        try {
+            if (ok.es == false) { return false; }
+            String texto = "";
+            texto = objeto_a_validar.toString();
+            if (texto.equals(k_entradas_tipo_cero) || texto.equals(k_entradas_tipo_uno)) {
+                return true;
+            } else if (utilizar_valor_por_defecto(texto, ok, extras_array) == false) {
+                in = ResourceBundles.getBundle(k_in_ruta);
+                ok.setTxt(tr.in(in, "0 = libre, no; 1 = marcado, sí. "), ok);
             }
         } catch (Exception e) {
             throw e;
@@ -311,9 +341,7 @@ public class entradas extends controles {
             ok.setTxt(tr.in(in, "Error en el formato de ruta y archivo. "), e);
         }
         return ok.es;
-    }
-    
-    
+    }       
     /**
      * Convierte el objeto_a_convertir a otro objeto (puede ser otra clase)
      * @param modo_operacion
@@ -331,37 +359,59 @@ public class entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 if (utilizar_valor_por_defecto(objeto_a_convertir, ok, extras_array)) {
                     return valor;
+                } else {
+                    if (objeto_a_convertir != null) {
+                        String texto = objeto_a_convertir.toString();
+                        if (texto.equals(k_entradas_codigo_borrar)) {
+                            objeto_a_convertir = null;
+                        }
+                    }
                 }
-                if (_entrada_tipo.equals(k_entradas_tipo_ruta_archivo)) {
+                if (_control_tipo.equals(k_entradas_tipo_ruta_archivo)) {
+                    if (objeto_a_convertir == null) {
+                        return null;
+                    }
                     return new File(objeto_a_convertir.toString());
-                } else if (_entrada_tipo.equals(k_entradas_tipo_numero)
-                        || _entrada_tipo.equals(k_entradas_tipo_mes)
-                        || _entrada_tipo.equals(k_entradas_tipo_semana)
-                        || _entrada_tipo.equals(k_entradas_tipo_rango)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_numero)
+                        || _control_tipo.equals(k_entradas_tipo_mes)
+                        || _control_tipo.equals(k_entradas_tipo_semana)
+                        || _control_tipo.equals(k_entradas_tipo_rango)) {
+                    if (objeto_a_convertir == null) {
+                        return null;
+                    }
                     BigDecimal bigDecimal = null;
                     if (ser_valor_vacio(objeto_a_convertir, ok, extras_array) == false) {
                         Double doble = Double.valueOf(objeto_a_convertir.toString());
                         bigDecimal = new BigDecimal(doble);
                     }
                     return bigDecimal;
-                } else if (_entrada_tipo.equals(k_entradas_tipo_fecha)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_fecha)) {
+                    if (objeto_a_convertir == null) {
+                        return null;
+                    }
                     Date date;
                     date = patrones.convertir_fecha(objeto_a_convertir.toString(), ok);
                     return date;
-                } else if (_entrada_tipo.equals(k_entradas_tipo_fecha_y_hora)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_fecha_y_hora)) {
+                    if (objeto_a_convertir == null) {
+                        return null;
+                    }
                     Date date;
                     date = patrones.convertir_fecha_y_hora(objeto_a_convertir.toString(), ok);
                     return date;
-                } else if (_entrada_tipo.equals(k_entradas_tipo_hora)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_hora)) {
+                    if (objeto_a_convertir == null) {
+                        return null;
+                    }
                     Date date;
                     date = patrones.convertir_hora(objeto_a_convertir.toString(), ok);
                     return date;
-                } else if (_entrada_tipo.equals(k_entradas_tipo_submit)
-                        || _entrada_tipo.equals(k_entradas_tipo_reset)
-                        || _entrada_tipo.equals(k_entradas_tipo_imagen)
-                        || _entrada_tipo.equals(k_entradas_tipo_boton)
-                        || _entrada_tipo.equals(k_entradas_tipo_checkbox)
-                        || _entrada_tipo.equals(k_entradas_tipo_radio)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_submit)
+                        || _control_tipo.equals(k_entradas_tipo_reset)
+                        || _control_tipo.equals(k_entradas_tipo_con_imagen)
+                        || _control_tipo.equals(k_entradas_tipo_boton)
+                        || _control_tipo.equals(k_entradas_tipo_checkbox)
+                        || _control_tipo.equals(k_entradas_tipo_radio)) {
                     Boolean bool;
                     String texto;
                     if (objeto_a_convertir == null) {
@@ -377,6 +427,9 @@ public class entradas extends controles {
                     }
                     return bool;
                 } else {
+                    if (objeto_a_convertir == null) {
+                        return "";
+                    }
                     return objeto_a_convertir.toString();
                 }
             }
@@ -401,20 +454,14 @@ public class entradas extends controles {
         try {
             if (ok.es == false) { return null; }
             if (modo_operacion.equals(k_fase_procesamiento)) {
-                if (_entrada_tipo.equals(k_entradas_tipo_password)) {
+                if (_control_tipo.equals(k_entradas_tipo_password)) {
                     object = _capturar_contraseña(objeto_a_capturar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_hidden)) {
-                } else if (_entrada_tipo.equals(k_entradas_tipo_submit)) {
-                    object = _capturar_boton(objeto_a_capturar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_reset)) {
-                    object = _capturar_boton(objeto_a_capturar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_imagen)) {
-                    object = _capturar_boton(objeto_a_capturar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_boton)) {
-                    object = _capturar_boton(objeto_a_capturar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_checkbox)) {
-                    object = _capturar_boton(objeto_a_capturar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_radio)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_hidden)
+                        || _control_tipo.equals(k_entradas_tipo_submit)
+                        || _control_tipo.equals(k_entradas_tipo_reset)
+                        || _control_tipo.equals(k_entradas_tipo_boton)
+                        || _control_tipo.equals(k_entradas_tipo_checkbox)
+                        || _control_tipo.equals(k_entradas_tipo_con_imagen)) {
                     object = _capturar_boton(objeto_a_capturar, ok, extras_array);                    
                 } else {
                     object = _capturar_texto(objeto_a_capturar, ok, extras_array);
@@ -438,8 +485,10 @@ public class entradas extends controles {
         try {
             if (ok.es == false) { return null; }
             linea = _clui_lectura.leer_linea(ok);
+            if (ok.es == false) { return null; }
             if (linea.equals(k_entradas_codigo_cancelar)) {
-                _formulario.terminar(ok, extras_array);
+                _formulario.cancelar(ok, extras_array);
+                return null;
             }
         } catch (Exception e) {
             throw e;
@@ -459,22 +508,7 @@ public class entradas extends controles {
         ResourceBundle in;
         try {
             if (ok.es == false) { return null; }
-            while (true) {
-                ok.iniciar();
-                linea = _clui_lectura.leer_linea(ok, extras_array);
-                linea = linea.trim();
-                if (linea.equals(k_entradas_codigo_cancelar)) {
-                    _formulario.terminar(ok, extras_array);
-                }
-                if (linea.equals(k_entradas_tipo_cero) || linea.equals(k_entradas_tipo_uno)) {
-                    break;
-                } else if (utilizar_valor_por_defecto(linea, ok, extras_array) == false) {
-                    in = ResourceBundles.getBundle(k_in_ruta);
-                    _formulario.escribir_linea_error(tr.in(in, "0 = libre, no; 1 = marcado, sí. "), ok);
-                } else {
-                    break;
-                }
-            }
+            linea = _clui_lectura.leer_linea(ok, extras_array);
         } catch (Exception e) {
             throw e;
         }
@@ -492,15 +526,11 @@ public class entradas extends controles {
         String linea = null;
         try {
             if (ok.es == false) { return null; }
-            Console console = System.console();
-            if (console != null) {
-                char [] password_array = console.readPassword();
-                linea = new String (password_array);
-            } else {
-                linea = _clui_lectura.leer_linea(ok, extras_array);
-            }                
+            linea = _clui_lectura.leer_contraseña(ok, extras_array);
+            if (ok.es == false) { return null; }
             if (linea.equals(k_entradas_codigo_cancelar)) {
-                _formulario.terminar(ok, extras_array);
+                _formulario.cancelar(ok, extras_array);
+                return null;
             }
         } catch (Exception e) {
             throw e;
@@ -520,22 +550,22 @@ public class entradas extends controles {
         try {
             if (ok.es == false) { return false; }
             if (modo_operacion.equals(k_fase_procesamiento)) {
-                if (_entrada_tipo.equals(k_entradas_tipo_fecha)) {
+                if (_control_tipo.equals(k_entradas_tipo_fecha)) {
                     return _presentar_fecha(modo_operacion, objeto_a_presentar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_fecha_y_hora)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_fecha_y_hora)) {
                     return _presentar_fecha_y_hora(modo_operacion, objeto_a_presentar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_hora)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_hora)) {
                     return _presentar_hora(modo_operacion, objeto_a_presentar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_color)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_color)) {
                     return _presentar_color(modo_operacion, objeto_a_presentar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_submit)
-                        || _entrada_tipo.equals(k_entradas_tipo_reset)
-                        || _entrada_tipo.equals(k_entradas_tipo_imagen)
-                        || _entrada_tipo.equals(k_entradas_tipo_boton)
-                        || _entrada_tipo.equals(k_entradas_tipo_checkbox)
-                        || _entrada_tipo.equals(k_entradas_tipo_radio)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_submit)
+                        || _control_tipo.equals(k_entradas_tipo_reset)
+                        || _control_tipo.equals(k_entradas_tipo_con_imagen)
+                        || _control_tipo.equals(k_entradas_tipo_boton)
+                        || _control_tipo.equals(k_entradas_tipo_checkbox)
+                        || _control_tipo.equals(k_entradas_tipo_radio)) {
                     return _presentar_duopcion(modo_operacion, objeto_a_presentar, ok, extras_array);
-                } else if (_entrada_tipo.equals(k_entradas_tipo_password)) {
+                } else if (_control_tipo.equals(k_entradas_tipo_password)) {
                     return _presentar_password(modo_operacion, objeto_a_presentar, ok, extras_array);
                 } else {
                     super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
@@ -551,6 +581,7 @@ public class entradas extends controles {
                         texto = objeto_a_presentar.toString();
                     }
                     _formulario.escribir(k_entradas_codigo_cancelar
+                            + " " + k_entradas_codigo_borrar
                             + " [" + texto + "] > "
                             , ok);
                 }
@@ -587,6 +618,7 @@ public class entradas extends controles {
                     texto = texto.replaceAll(".", "*");
                 }
                 _formulario.escribir(k_entradas_codigo_cancelar
+                        + " " + k_entradas_codigo_borrar
                         + " [" + texto + "] > "
                         , ok);
             }            
@@ -662,6 +694,7 @@ public class entradas extends controles {
                     texto = formar_texto(null, "%1$td/%1$tm/%1$tY", ok, (Date) objeto_a_presentar);
                 }
                 _formulario.escribir(k_entradas_codigo_cancelar
+                        + " " + k_entradas_codigo_borrar
                         + " <" + k_patrones_formato_fecha + ">"
                         + " [" + texto + "] > "
                         , ok);
@@ -699,6 +732,7 @@ public class entradas extends controles {
                     texto = formar_texto(null, "%1$tH:%1$tM", ok, objeto_a_presentar);
                 }
                 _formulario.escribir(k_entradas_codigo_cancelar
+                        + " " + k_entradas_codigo_borrar
                         + " <" + k_patrones_formato_hora + ">"
                         + " [" + texto + "] > "
                         , ok);
@@ -736,6 +770,7 @@ public class entradas extends controles {
                     texto = formar_fecha(null, (Date) objeto_a_presentar, ok);
                 }
                 _formulario.escribir(k_entradas_codigo_cancelar
+                        + " " + k_entradas_codigo_borrar
                         + " <(" + k_patrones_formato_fecha + ") (" + k_patrones_formato_hora + ")>"
                         + " [" + texto + "] > "
                         , ok);
@@ -771,6 +806,7 @@ public class entradas extends controles {
                     texto = objeto_a_presentar.toString();
                 }
                 _formulario.escribir(k_entradas_codigo_cancelar
+                        + " " + k_entradas_codigo_borrar
                         + " <" + k_entradas_formato_color + ">"
                         + " [" + texto + "] > "
                         , ok);
@@ -796,13 +832,13 @@ public class entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 object = super.procesar(modo_operacion, objeto_a_procesar, ok, extras_array);
                 if (ok.es) {
-                    if (_entrada_tipo.equals(k_entradas_tipo_submit)) {
+                    if (_control_tipo.equals(k_entradas_tipo_submit)) {
                         if((Boolean) object) {
                             _formulario.terminar(ok, extras_array);
                         } else {
                             _formulario.cancelar(ok, extras_array);
                         }
-                    } else if (_entrada_tipo.equals(k_entradas_tipo_reset)
+                    } else if (_control_tipo.equals(k_entradas_tipo_reset)
                            && (Boolean) object) {
                             _formulario.repetir(ok, extras_array);
                     }
@@ -816,7 +852,8 @@ public class entradas extends controles {
     /**
      * Conecta un control con un formulario
      * @param formulario Formulario donde incorporar el control (por orden de inclusión)
-     * @param nombre Nombre identificador del formulario (en un grupo exclusivo el clave puede repetirse)
+     * @param clave Nombre identificador del formulario (en un grupo exclusivo el clave puede repetirse)
+     * @param valor Valor inicial (puede ser null)
      * @param mensaje_de_captura Mensaje que presentar en la captura
      * @param opciones_mapa Opciones que va a utilizar el control en algunas de sus fases (puede ser null)
      * @param ok
@@ -824,10 +861,12 @@ public class entradas extends controles {
      * @return true si no hay errores
      * @throws Exception 
      */
-    public boolean poner_en_formulario(formularios formulario, String nombre, String mensaje_de_captura, Map<String, Object> opciones_mapa, oks ok, Object ... extras_array) throws Exception {
+    @Override
+    public boolean poner_en_formulario(formularios formulario, String clave, Object valor, String mensaje_de_captura, Map<String, Object> opciones_mapa, oks ok, Object ... extras_array) throws Exception {
         ResourceBundle in;
         try {
-            super.poner_en_formulario(formulario, nombre, mensaje_de_captura, opciones_mapa, ok, extras_array);
+            if (ok.es == false) { return false; }
+            super.poner_en_formulario(formulario, clave, valor, mensaje_de_captura, opciones_mapa, ok, extras_array);
             if (ok.es) {
                 _clui_lectura = (clui_lecturas) this.opciones_mapa.get(k_entradas_clui_lectura);
                 if (_clui_lectura == null) {
@@ -839,4 +878,6 @@ public class entradas extends controles {
             throw e;
         }
         return ok.es;
-    }}
+    }
+
+}

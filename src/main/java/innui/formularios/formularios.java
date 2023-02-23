@@ -1,7 +1,5 @@
 package innui.formularios;
 
-import static innui.formularios.controles.k_fase_captura;
-import static innui.formularios.controles.k_fase_procesamiento;
 import innui.bases;
 import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.errores.oks;
@@ -21,6 +19,8 @@ import java.util.ResourceBundle;
  */
 public class formularios extends bases {
     public static String k_in_base = "in/innui/formularios/in";
+    public static String k_fase_captura = "fase_captura";
+    public static String k_fase_procesamiento = "fase_procesamiento";
     public static String k_importar_no_encontrado = "importar_no_encontrado";
     
     public LinkedList<controles> _controles_lista = new LinkedList<>();
@@ -165,7 +165,7 @@ public class formularios extends bases {
         return ok.es;
     }
     /** 
-     * Evita que se continúe con la captura del _formulario
+     * Cancela el _formulario
      * @param ok
      * @param extras_array
      * @return

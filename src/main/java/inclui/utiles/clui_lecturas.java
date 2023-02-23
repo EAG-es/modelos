@@ -1,10 +1,12 @@
 package inclui.utiles;
 
 import innui.bases;
+import innui.modelos.concurrencias.Threads;
 import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.errores.oks;
 import innui.modelos.internacionalizacion.tr;
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -145,77 +147,6 @@ public class clui_lecturas extends bases {
         }
     }
     /**
-     * Procesa una letra leída al leer una línea
-     * @param letra
-     * @param ok Comunicar resultados
-     * @param extra_array Opción de añadir parámetros en el futuro.
-     * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
-     * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
-     * @return true si todo va bien
-     * @throws Exception Opción de notificar errores de excepción
-     */
-    public Character leer_linea_a_letras_procesar_letra(Character letra, oks ok, Object ... extra_array) throws Exception {
-    /**
-     * Lee una línea
-     * @param ok Comunicar resultados
-     * @param extra_array Opción de añadir parámetros en el futuro.
-     * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
-     * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
-     * @return true si todo va bien
-     * @throws Exception Opción de notificar errores de excepción
-     */
-        try {
-            if (ok.es == false) { return null; }
-            return letra;
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-    
-    public String leer_linea_a_letras(oks ok, Object ... extra_array) throws Exception {
-        try {
-            if (ok.es == false) { return null; }
-            String linea = null;
-            ResourceBundle in = null;
-            in = ResourceBundles.getBundle(k_in_ruta);
-            char [] letra_array = new char[1];
-            try {
-                if (extra_array.length > 0) {
-                    if ((Boolean) extra_array[0]) {
-                        while (_bufferedReader.ready()) {
-                            _bufferedReader.skip(1);
-                        }
-                    }
-                }
-                linea = "";
-                while (true) {
-                    if (_bufferedReader.read(letra_array) == -1) {
-                        break;
-                    }
-                    letra_array[0] = leer_linea_a_letras_procesar_letra(letra_array[0], ok);
-                    if (ok.es == false) { break; }
-                    if (letra_array[0] == '\n') {
-                        break;
-                    }
-                    linea = linea + letra_array[0];
-                }
-                if (extra_array.length > 1) {
-                    if ((Boolean) extra_array[1]) {
-                        while (_bufferedReader.ready()) {
-                            _bufferedReader.skip(1);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                ok.setTxt(e.getMessage(), tr.in(in, "Excepción leyendo línea. "));
-                linea = null;
-            }
-            return linea;
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-    /**
      * Lee una línea
      * @param ok Comunicar resultados
      * @param extra_array Opción de añadir parámetros en el futuro.
@@ -262,7 +193,7 @@ public class clui_lecturas extends bases {
      * @param extra_array Opción de añadir parámetros en el futuro.
      * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
      * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
-     * @return true si todo va bien
+     * @return El bigdecimal
      * @throws Exception Opción de notificar errores de excepción
      */
     public BigDecimal leer_bigdecimal(oks ok, Object ... extra_array) throws Exception {
@@ -303,7 +234,7 @@ public class clui_lecturas extends bases {
      * @param extra_array Opción de añadir parámetros en el futuro.
      * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
      * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
-     * @return true si todo va bien
+     * @return La línea con el bigdecimal
      * @throws Exception Opción de notificar errores de excepción
      */
     public BigDecimal leer_bigdecimal_linea(oks ok, Object ... extra_array) throws Exception {
@@ -313,4 +244,48 @@ public class clui_lecturas extends bases {
         leer_linea(ok, extra_array);
         return retorno;
     }
+    /**
+     * Lee una contraseña desde la consola, o desde la entrada estandar (en ese caso, pone letras en la pantalla antes de la contraseña)
+     * @param ok Comunicar resultados
+     * @param extra_array Opción de añadir parámetros en el futuro.
+     * - posición 0: Boolean true -> Descartar lo que hubiera pendiente de leer antes
+     * - posición 1: Boolean true -> Descartar lo que hubiera pendiente de leer después
+     * @return La línea con el bigdecimal
+     * @throws Exception Opción de notificar errores de excepción
+     */
+    public String leer_contraseña(oks ok, Object ... extra_array) throws Exception {
+        String linea = null;
+        try {
+            if (ok.es == false) { return null; }
+            Console console = System.console();
+            if (console != null) {
+                char [] password_array = console.readPassword();
+                linea = new String (password_array);
+            } else {
+                String texto = "1234567890abcdefghijklmopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                Double doble;
+                int i;
+                int repeticiones;
+                doble = Math.random();
+                doble = doble * 5 + 3;
+                repeticiones = doble.intValue();
+                while (true) {
+                    if (repeticiones < 0) {
+                        break;
+                    }
+                    doble = Math.random();
+                    doble = doble * texto.length();
+                    i = doble.intValue() ;
+                    escribir(texto.substring(i, i + 1), ok, extra_array);
+                    if (ok.es == false) { return null; }
+                    repeticiones = repeticiones - 1;
+                }
+                linea = leer_linea(ok, extra_array);
+            }                
+        } catch (Exception e) {
+            throw e;
+        }
+        return linea;
+    }    
+    
 }

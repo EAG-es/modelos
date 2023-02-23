@@ -2,9 +2,8 @@ package inclui.formularios;
 
 import innui.formularios.formularios;
 import innui.formularios.controles;
-import static innui.formularios.controles.k_fase_procesamiento;
-import static inclui.formularios.entradas.k_entradas_clui_lectura;
-import static inclui.formularios.entradas.k_entradas_tipo_radio;
+import static inclui.formularios.control_entradas.k_entradas_clui_lectura;
+import static inclui.formularios.control_entradas.k_entradas_tipo_radio;
 import inclui.utiles.clui_lecturas;
 import innui.modelos.errores.oks;
 import java.util.ArrayList;
@@ -89,7 +88,7 @@ public class clui_formularios extends formularios {
                                 oks ok_1 = new oks();
                                 escribir_linea_error(ok.getTxt(), ok_1);
                                 if (ok_1.es == false) {
-                                    ok.setTxt(ok_1.getTxt());
+                                    ok.setTxt(ok.getTxt(), ok_1.getTxt());
                                     break;
                                 }
                                 _es_repetir = true;
@@ -113,7 +112,7 @@ public class clui_formularios extends formularios {
             if (ok.es == false) { return false; }
             Map<String, controles> nombres_mapa = new HashMap<>();
             Map<String, List<controles>> lista_controles_mapa = new HashMap<>();
-            entradas entrada_primera;
+            control_entradas entrada_primera;
             for (controles control: _controles_lista) {
                 if (nombres_mapa.containsKey(control.clave) == false) {
                     nombres_mapa.put(control.clave, control);
@@ -125,11 +124,11 @@ public class clui_formularios extends formularios {
                         lista_controles_mapa.get(control.clave).add(nombres_mapa.get(control.clave));                            
                         lista_controles_mapa.get(control.clave).add(control);
                     }
-                    if (control instanceof entradas) {
+                    if (control instanceof control_entradas) {
                         controles control_primero = lista_controles_mapa.get(control.clave).get(0);
-                        if (control_primero instanceof entradas) {
-                            entrada_primera = (entradas) control_primero;
-                            if (entrada_primera._entrada_tipo.equals(((entradas) control)._entrada_tipo) == false) {
+                        if (control_primero instanceof control_entradas) {
+                            entrada_primera = (control_entradas) control_primero;
+                            if (entrada_primera._control_tipo.equals(((control_entradas) control)._control_tipo) == false) {
                                 ok.setTxt("Grupo de controles con mismo nombre y distinto tipo de entrada: " + control.clave);
                                 break;
                             }
@@ -145,9 +144,9 @@ public class clui_formularios extends formularios {
             for (Entry<String, List<controles>> entry: lista_controles_mapa.entrySet()) {
                 int i = 0;
                 for (controles control: entry.getValue()) {
-                    if (control instanceof entradas) {
-                        entradas entrada = (entradas) control;
-                        if (entrada._entrada_tipo.equals(k_entradas_tipo_radio)) {                    
+                    if (control instanceof control_entradas) {
+                        control_entradas entrada = (control_entradas) control;
+                        if (entrada._control_tipo.equals(k_entradas_tipo_radio)) {                    
                             if ((Boolean)(entrada.valor) != false) {
                                 i = i + 1;
                             }
