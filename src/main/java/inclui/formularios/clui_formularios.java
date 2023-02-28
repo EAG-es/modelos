@@ -52,20 +52,6 @@ public class clui_formularios extends formularios {
         return ok.es;
     }
     /**
-     * No hace nada
-     * @param modo_operacion Es la fase de operación de los controles del _formulario
-     * @param ok
-     * @param extras_array
-     * @return 
-     * @throws Exception 
-     */
-    @Override
-    public boolean capturar(String modo_operacion, oks ok, Object ... extras_array) throws Exception {
-        if (ok.es == false) { return false; }
-        return ok.es;        
-    }
-
-    /**
      * Realiza los procesos posteriores a la captura de los datos
      * @param modo_operacion Es la fase de operación de los controles del _formulario
      * @param ok

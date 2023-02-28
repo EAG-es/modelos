@@ -64,23 +64,6 @@ public class clui_formulariosTest {
     }
 
     /**
-     * Test of capturar method, of class clui_formularios.
-     */
-    @Ignore
-    public void testCapturar() throws Exception {
-        System.out.println("capturar");
-        String modo_operacion = "";
-        oks ok = null;
-        Object[] extras_array = null;
-        clui_formularios instance = new clui_formularios();
-        boolean expResult = false;
-        boolean result = instance.capturar(modo_operacion, ok, extras_array);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of procesar method, of class clui_formularios.
      * @throws java.lang.Exception
      */
@@ -146,7 +129,7 @@ public class clui_formulariosTest {
         entrada_texto.poner_en_formulario(clui_formulario, "calle", null, "Introduzca primera parte de su dirección (solo nombre de la calle). ", null, ok);
         assertEquals(true, ok.es);
         control_entradas entrada_numero = new control_entradas();
-        entrada_texto.iniciar(k_entradas_tipo_numero, ok);
+        entrada_numero.iniciar(k_entradas_tipo_numero, ok);
         assertEquals(true, ok.es);
         entrada_numero.poner_en_formulario(clui_formulario, "portal_num", null, "Introduzca el número del portal de su dirección. ", null, ok);
         assertEquals(true, ok.es);
@@ -156,12 +139,12 @@ public class clui_formulariosTest {
         entrada_texto.poner_en_formulario(clui_formulario, "calle_extra", null, "Introduzca parte extra de su dirección (piso y puerta se piden a continuación). ", null, ok);
         assertEquals(true, ok.es);
         entrada_numero = new control_entradas();
-        entrada_texto.iniciar(k_entradas_tipo_numero, ok);
+        entrada_numero.iniciar(k_entradas_tipo_numero, ok);
         assertEquals(true, ok.es);
         entrada_numero.poner_en_formulario(clui_formulario, "piso_num", null, "Introduzca el piso de su dirección (0 si no hay). ", null, ok);
         assertEquals(true, ok.es);
         entrada_numero = new control_entradas();
-        entrada_texto.iniciar(k_entradas_tipo_numero, ok);
+        entrada_numero.iniciar(k_entradas_tipo_numero, ok);
         assertEquals(true, ok.es);
         entrada_numero.poner_en_formulario(clui_formulario, "puerta_num", null, "Introduzca la puerta de su dirección (0 si no hay). ", null, ok);
         assertEquals(true, ok.es);
@@ -175,10 +158,10 @@ public class clui_formulariosTest {
         assertEquals(true, ok.es);
         entrada_texto.poner_en_formulario(clui_formulario, "ciudad", null, "Introduzca la ciudad. ", null, ok);
         assertEquals(true, ok.es);
-        entrada_texto = new control_entradas();
-        entrada_texto.iniciar(k_entradas_tipo_numero, ok);
+        entrada_numero = new control_entradas();
+        entrada_numero.iniciar(k_entradas_tipo_numero, ok);
         assertEquals(true, ok.es);
-        entrada_texto.poner_en_formulario(clui_formulario, "codigo_postal", null, "Introduzca el código postal. ", null, ok);
+        entrada_numero.poner_en_formulario(clui_formulario, "codigo_postal", null, "Introduzca el código postal. ", null, ok);
         assertEquals(true, ok.es);
         entrada_texto = new control_entradas();
         entrada_texto.iniciar(k_entradas_tipo_texto, ok);

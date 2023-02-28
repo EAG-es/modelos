@@ -35,7 +35,7 @@ public class formularios extends bases {
         return ok.es;
     }
     /**
-     * Inicia el proceso de capruta y procesamiento de la información
+     * Inicia el proceso de captura y procesamiento de la información
      * @param modo_operacion Es la fase de operación de los controles del _formulario
      * @param ok
      * @param extras_array
@@ -63,44 +63,7 @@ public class formularios extends bases {
      * @throws Exception 
      */
     public boolean capturar(oks ok, Object ... extras_array) throws Exception {
-        return capturar(k_fase_captura, ok, extras_array);
-    }
-    /**
-     * Realiza los procesos de la fase de captura.
-     * _iniciar_formulario, procesar, terminar_formulario
-     * Si estos procesos retornan ok.es == false, procesar termina.
-     * @param modo_operacion Es la fase de operación de los controles del _formulario
-     * @param ok
-     * @param extras_array
-     * @return 
-     * @throws Exception 
-     */
-    public boolean capturar(String modo_operacion, oks ok, Object ... extras_array) throws Exception {
-        try {
-            if (ok.es == false) { return false; }
-            Object object;
-            while (true) {
-                ok.iniciar();
-                _iniciar_formulario(modo_operacion, ok, extras_array);
-                if (ok.es == false) { return false; }
-                for (controles control: _controles_lista) {
-                    if (_es_terminar) {
-                        break;
-                    }
-                    object = control.procesar(modo_operacion, control.valor, ok, extras_array);
-                    if (ok.es == false) { break; }
-                    control.valor = object;
-                    if (_es_repetir) {
-                        break;
-                    }
-                }
-                _terminar_formulario(modo_operacion, ok, extras_array);                
-                break;
-            }                       
-        } catch (Exception e) {
-            throw e;
-        }
-        return ok.es;
+        return procesar(k_fase_captura, ok, extras_array);
     }
     /** 
      * Repite la captura del _formulario

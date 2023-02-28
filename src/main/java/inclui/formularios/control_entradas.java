@@ -47,8 +47,8 @@ public class control_entradas extends controles {
     public static String k_entradas_tipo_boton = "button";
     public static String k_entradas_tipo_checkbox = "checkbox";
     public static String k_entradas_tipo_radio = "radio";
-    public static String k_entradas_tipo_cero = "0";
-    public static String k_entradas_tipo_uno = "1";
+    public static String k_entradas_cero = "0";
+    public static String k_entradas_uno = "1";
     public static String k_entradas_codigo_cancelar = ".X.";
     public static String k_entradas_codigo_borrar = ".0.";
     public static String k_entradas_patron_color = "#[0-9ABCDEF][0-9ABCDEF][0-9ABCDEF][0-9ABCDEF][0-9ABCDEF][0-9ABCDEF]";
@@ -208,7 +208,7 @@ public class control_entradas extends controles {
             if (ok.es == false) { return false; }
             String texto = "";
             texto = objeto_a_validar.toString();
-            if (texto.equals(k_entradas_tipo_cero) || texto.equals(k_entradas_tipo_uno)) {
+            if (texto.equals(k_entradas_cero) || texto.equals(k_entradas_uno)) {
                 return true;
             } else if (utilizar_valor_por_defecto(texto, ok, extras_array) == false) {
                 in = ResourceBundles.getBundle(k_in_ruta);
@@ -420,7 +420,7 @@ public class control_entradas extends controles {
                         texto = objeto_a_convertir.toString();
                     }
                     texto = texto.trim();
-                    if (texto.equals(k_entradas_tipo_cero)) {
+                    if (texto.equals(k_entradas_cero)) {
                         bool = false;
                     } else {
                         bool = true;
@@ -843,6 +843,8 @@ public class control_entradas extends controles {
                             _formulario.repetir(ok, extras_array);
                     }
                 }
+            } else {
+                object = super.procesar(modo_operacion, objeto_a_procesar, ok, extras_array);
             }
         } catch (Exception e) {
             throw e;
@@ -871,6 +873,7 @@ public class control_entradas extends controles {
                 _clui_lectura = (clui_lecturas) this.opciones_mapa.get(k_entradas_clui_lectura);
                 if (_clui_lectura == null) {
                     in = ResourceBundles.getBundle(k_in_ruta);
+                    ok.id = k_entradas_clui_lectura;
                     ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_entradas_clui_lectura);
                 }
             }
