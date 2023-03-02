@@ -3,20 +3,25 @@ package inclui.formularios;
 import innui.formularios.formularios;
 import innui.formularios.controles;
 import static inclui.formularios.control_entradas.k_entradas_clui_lectura;
+import static inclui.formularios.control_entradas.k_entradas_codigo_cancelar;
 import static inclui.formularios.control_entradas.k_entradas_tipo_radio;
 import inclui.utiles.clui_lecturas;
+import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.errores.oks;
+import innui.modelos.internacionalizacion.tr;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 
 /**
  *
  * @author emilio
  */
 public class clui_formularios extends formularios {
+    public static String k_in_base = "in/inclui/formularios/in";    
     public static String k_error_nombres_repetidos = "error_nombres_repetidos";
     public clui_lecturas _clui_lectura = new clui_lecturas();
     
@@ -52,7 +57,7 @@ public class clui_formularios extends formularios {
         return ok.es;
     }
     /**
-     * Realiza los procesos posteriores a la captura de los datos
+     * Realiza los procesos posteriores a la valor_de_captura de los datos
      * @param modo_operacion Es la fase de operación de los controles del _formulario
      * @param ok
      * @param extras_array
@@ -86,6 +91,8 @@ public class clui_formularios extends formularios {
                     }
                     break;
                 }
+            } else {
+                super.procesar(modo_operacion, ok, extras_array);
             }
         } catch (Exception e) {
             throw e;
@@ -132,8 +139,9 @@ public class clui_formularios extends formularios {
                 for (controles control: entry.getValue()) {
                     if (control instanceof control_entradas) {
                         control_entradas entrada = (control_entradas) control;
-                        if (entrada._control_tipo.equals(k_entradas_tipo_radio)) {                    
-                            if ((Boolean)(entrada.valor) != false) {
+                        if (entrada._control_tipo.equals(k_entradas_tipo_radio)) {
+                            if (entrada.valor != null 
+                             && entrada.valor.toString().startsWith(k_entradas_codigo_cancelar) == false) {
                                 i = i + 1;
                             }
                         } else if (control.valor != null) {
@@ -158,4 +166,11 @@ public class clui_formularios extends formularios {
         return ok.es;
     }
     
+    @Override
+    public boolean capturar(oks ok, Object ... extras_array) throws Exception {
+        ResourceBundle in;
+        in = ResourceBundles.getBundle(k_in_base);
+        ok.setTxt(tr.in(in, "No existe la fase de captura en este formulario. "));
+        return ok.es;
+    }
 }
