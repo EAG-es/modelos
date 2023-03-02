@@ -44,7 +44,7 @@ public class control_textareas extends control_entradas {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 _formulario.escribir_linea(mensaje_de_captura, ok, extras_array);
                 if (ok.es == false) { return false; }
-                if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                     objeto_a_presentar = valor;
                 }
                 if (ok.es == false) { return false; }

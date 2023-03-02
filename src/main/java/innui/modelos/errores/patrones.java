@@ -3,11 +3,10 @@ package innui.modelos.errores;
 import innui.bases;
 import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.internacionalizacion.tr;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ResourceBundle;
-import static inclui.formularios.control_entradas.k_in_ruta;
-import static innui.formularios.controles.k_in_ruta;
 
 public class patrones extends bases {
     public static String k_in_ruta = "in/innui/modelos/errores/in";
@@ -256,14 +255,16 @@ public class patrones extends bases {
                 "(\\+[0-9]+[\\- \\.]*)?"
                 + "(\\([0-9]+\\)[\\- \\.]*)?"
                 + "([0-9][0-9\\- \\.]+[0-9])";
-
-    public static String k_patrones_fecha = "?:(?:31(\\/|-|\\.)(?:0?[13578]|1[02]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})$|^(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2}";
-    public static String k_patrones_formato_fecha = "dd/MM/yyyy | dd-MM-yyyy | dd.MM.yyyy";
+    // (?:(?:31(\/|-|\.)(?:0?[13578]|1[0-2]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})|(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))|(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})
+//    public static String k_patrones_fecha_diamesaño = "(?:(?:31(\\/|-|\\.)(?:0?[13578]|1[0-2]))\\1|(?:(?:29|30)(\\/|-|\\.)(?:0?[13-9]|1[0-2])\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})|(?:29(\\/|-|\\.)0?2\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))|(?:0?[1-9]|1\\d|2[0-8])(\\/|-|\\.)(?:(?:0?[1-9])|(?:1[0-2]))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})";
+    // (\d{4}\-((((0[13578])|(1[02]))\-(([0-2][0-9])|(3[01])))|(((0[469])|(11))\-(([0-2][0-9])|(30)))|(02\-[0-2][0-9])))
+//    public static String k_patrones_fecha_añomesdia = "(\\d{4}\\-((((0[13578])|(1[02]))\\-(([0-2][0-9])|(3[01])))|(((0[469])|(11))\\-(([0-2][0-9])|(30)))|(02\\-[0-2][0-9])))";
+    public static String k_patrones_formato_fecha = "yyyy-MM-dd | dd/MM/yyyy | dd-MM-yyyy | dd.MM.yyyy";
     public static String k_patrones_hora = "(2[0-3]|[01]?[0-9]):([0-5]?[0-9])|(2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])";
     public static String k_patrones_formato_hora = "HH:mm | HH:mm:ss";
     
     /**
-     * Valida una fecha con los formatos k_patrones_fecha
+     * Valida una fecha con los formatos k_patrones_fecha_diamesaño
      * @param texto
      * @param ok
      * @param extras_array
@@ -274,12 +275,17 @@ public class patrones extends bases {
         try {
             if (ok.es == false) { return false; }
             ResourceBundle in;
-            String regex = "^(" + k_patrones_fecha + ")$";
-            texto = texto.trim();
-            ok.es = texto.matches(regex);
+//            String regex = "^(" + k_patrones_fecha_diamesaño + ")$";
+//            texto = texto.trim();
+//            ok.es = texto.matches(regex);
+//            if (ok.es == false) {
+//                regex = "^(" + k_patrones_fecha_añomesdia + ")$";
+//                ok.es = texto.matches(regex);
+//            }
+            ok.es = (convertir_fecha(texto, ok, extras_array) != null);
             if (ok.es == false) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(dd/mm/aaaa | dd-mm-aaaa | dd.mm.aaaa)");
+                ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(dd/mm/aaaa | dd-mm-aaaa | dd.mm.aaaa | aaaa-mm-dd)");
             }
         } catch (Exception e) {
             throw e;
@@ -287,7 +293,7 @@ public class patrones extends bases {
         return ok.es;
     }
     /**
-     * Valida una fecha hora, con los formatos k_patrones_fecha + " " + k_patrones_hora
+     * Valida una fecha hora, con los formatos k_patrones_fecha_diamesaño + " " + k_patrones_hora
      * @param texto
      * @param ok
      * @param extras_array
@@ -298,12 +304,17 @@ public class patrones extends bases {
         try {
             if (ok.es == false) { return false; }
             ResourceBundle in;
-            String regex = "^(" + k_patrones_fecha + " " + k_patrones_hora + ")$";
-            texto = texto.trim();
-            ok.es = texto.matches(regex);
+//            String regex = "^(" + k_patrones_fecha_diamesaño + " " + k_patrones_hora + ")$";
+//            texto = texto.trim();
+//            ok.es = texto.matches(regex);
+//            if (ok.es == false) {
+//                regex = "^(" + k_patrones_fecha_añomesdia + "[Tt\\s]" + k_patrones_hora + ")$";
+//                ok.es = texto.matches(regex);
+//            }
+            ok.es = (convertir_fecha_y_hora(texto, ok, extras_array) != null);
             if (ok.es == false) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(dd/mm/aaaa | dd-mm-aaaa | dd.mm.aaaa) (hh:MM | hh:MM:ss)");
+                ok.setTxt(tr.in(in, "Error, no cumple con alguno de los formatos: ") + "(dd/mm/aaaa | dd-mm-aaaa | dd.mm.aaaa | aaaa-mm-dd)[Tt ](hh:MM | hh:MM:ss)");
             }
         } catch (Exception e) {
             throw e;
@@ -466,14 +477,19 @@ public class patrones extends bases {
         Date date = null;
         try {
             if (ok.es == false) { return null; }
-            ResourceBundle in;
             String [] formatos_array = k_patrones_formato_fecha.split("\\|");
             SimpleDateFormat dateFormat;
+            ParsePosition parsePosition;
             for (String formato: formatos_array) {
                 formato = formato.trim();
                 dateFormat = new SimpleDateFormat(formato);
+                parsePosition = new ParsePosition(0);
                 try {
-                    date = dateFormat.parse(texto);
+                    date = dateFormat.parse(texto, parsePosition);
+                    if (parsePosition.getErrorIndex() == -1
+                     && parsePosition.getIndex() == texto.length()) {
+                        break;
+                    }
                 } catch (Exception e_ignorar) {}
             }
         } catch (Exception e) {
@@ -493,14 +509,19 @@ public class patrones extends bases {
         Date date = null;
         try {
             if (ok.es == false) { return null; }
-            ResourceBundle in;
             String [] formatos_array = k_patrones_formato_hora.split("\\|");
             SimpleDateFormat dateFormat;
+            ParsePosition parsePosition;
             for (String formato: formatos_array) {
                 formato = formato.trim();
                 dateFormat = new SimpleDateFormat(formato);
+                parsePosition = new ParsePosition(0);
                 try {
-                    date = dateFormat.parse(texto);
+                    date = dateFormat.parse(texto, parsePosition);
+                    if (parsePosition.getErrorIndex() == -1
+                     && parsePosition.getIndex() == texto.length()) {
+                        break;
+                    }
                 } catch (Exception e_ignorar) {}
             }
         } catch (Exception e) {
@@ -523,7 +544,7 @@ public class patrones extends bases {
         try {
             if (ok.es == false) { return null; }
             ResourceBundle in;
-            String [] textos_array = texto.split(" ");
+            String [] textos_array = texto.split("[Tt\\s]");
             if (textos_array.length != 2) { return null; }
             Date date_fecha;
             date_fecha = convertir_fecha(textos_array[0], ok);

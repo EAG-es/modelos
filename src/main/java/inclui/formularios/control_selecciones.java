@@ -20,7 +20,7 @@ import java.util.TreeMap;
  */
 public class control_selecciones extends control_entradas {
     public static String k_in_ruta = "in/inclui/formularios/in";
-    public static String k_control_selecciones_opciones_mapa = "control_selecciones_opciones_mapa";
+    public static String k_opciones_mapa_control_selecciones = "control_selecciones_opciones_mapa";
     public static String k_control_selecciones_letras_por_linea_num = "control_selecciones_letras_por_linea_num";
     public Map<String, Object> control_selecciones_mapa;
     public Integer _letras_por_linea = 0;
@@ -28,17 +28,8 @@ public class control_selecciones extends control_entradas {
     public control_selecciones() {
         _control_tipo = k_entradas_tipo_numero;
     }
-
-    public Map<String, Object> getControl_selecciones_mapa() {
-        return control_selecciones_mapa;
-    }
-
-    public void setControl_selecciones_mapa(Map<String, Object> control_selecciones_mapa) {
-        this.control_selecciones_mapa = control_selecciones_mapa;
-    }
-    
     /**
-     * Inicia una textarea.
+     * Inicia una selección.
      * @param tipo_entrada Se ignora este parámetro
      * @param ok
      * @param extras_array
@@ -50,7 +41,14 @@ public class control_selecciones extends control_entradas {
         _control_tipo = k_entradas_tipo_numero;
         return ok.es;
     }
-    
+    /**
+     * Prepara el formato que aplicar al texto de una columna.
+     * @param formato
+     * @param ok
+     * @param extras_array
+     * @return El tamaño determinado de ancho de columna
+     * @throws Exception 
+     */
     public Integer obtener_formato_para_formar_texto(StringBuffer formato, oks ok, Object ... extras_array) throws Exception {
         Integer tam = 0;
         String formato_tex = "";
@@ -85,6 +83,7 @@ public class control_selecciones extends control_entradas {
         formato.append(formato_tex);
         return tam;
     }
+    
     @Override
     public boolean _presentar(String modo_operacion, Object objeto_a_presentar, oks ok, Object ... extras_array) throws Exception {
         try {
@@ -147,9 +146,9 @@ public class control_selecciones extends control_entradas {
         try {
             if (ok.es == false) { return false; }
             if (modo_operacion.equals(k_fase_procesamiento)) {
-                if (utilizar_valor_por_defecto(objeto_a_validar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_validar, ok, extras_array)) {
                     return true;
-                } else if (ser_valor_vacio(objeto_a_validar, ok, extras_array)) {
+                } else if (_ser_valor_vacio(objeto_a_validar, ok, extras_array)) {
                     if (this.opciones_mapa.containsKey(k_opciones_mapa_no_requerido) == false) {
                         in = ResourceBundles.getBundle(k_in_ruta);
                         ok.setTxt(tr.in(in, "Debe introducir un valor. "));
@@ -172,9 +171,9 @@ public class control_selecciones extends control_entradas {
      * Conecta un control con un formulario
      * @param formulario Formulario donde incorporar el control (por orden de inclusión)
      * @param clave Nombre identificador del formulario (en un grupo exclusivo el clave puede repetirse)
-     * @param mensaje_de_captura Mensaje que presentar en la captura
+     * @param mensaje_de_captura Mensaje que presentar en la valor_de_captura
      * @param opciones_mapa Opciones que va a utilizar el control en algunas de sus fases (debe contener: 
-     * k_control_selecciones_opciones_mapa, k_control_selecciones_letras_por_linea_num)
+ k_opciones_mapa_control_selecciones, k_control_selecciones_letras_por_linea_num)
      * @param ok
      * @param extras_array
      * @return true si no hay errores
@@ -188,10 +187,12 @@ public class control_selecciones extends control_entradas {
             if (ok.es == false) { return false; }
             super.poner_en_formulario(formulario, clave, valor, mensaje_de_captura, opciones_mapa, ok, extras_array);
             if (ok.es) {
-                control_selecciones_mapa = (Map<String, Object>) opciones_mapa.get(k_control_selecciones_opciones_mapa);
                 if (control_selecciones_mapa == null) {
-                    in = ResourceBundles.getBundle(k_in_ruta);
-                    ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_control_selecciones_opciones_mapa);
+                    control_selecciones_mapa = (Map<String, Object>) opciones_mapa.get(k_opciones_mapa_control_selecciones);
+                    if (control_selecciones_mapa == null) {
+                        in = ResourceBundles.getBundle(k_in_ruta);
+                        ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_opciones_mapa_control_selecciones);
+                    }
                 }
                 _letras_por_linea = (Integer) opciones_mapa.get(k_control_selecciones_letras_por_linea_num);
                 if (_letras_por_linea == null) {
@@ -204,17 +205,39 @@ public class control_selecciones extends control_entradas {
         }
         return ok.es;
     }
-    
-    public boolean cargar_propiedades(String ruta, oks ok, Object ... extras_array) throws Exception {
+    /**
+     * Carga el control con el contenido de un archivo de propiedades
+     * @param ruta
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean cargar_control_con_propiedades(String ruta, oks ok, Object ... extras_array) throws Exception {
+        control_selecciones_mapa = control_selecciones.cargar_propiedades(ruta, ok, extras_array);
+        if (opciones_mapa != null) {
+            opciones_mapa.put(k_opciones_mapa_control_selecciones, control_selecciones_mapa);
+        }
+        return ok.es;
+    }
+    /**
+     * Devuelve un mapa con el contenido de un archivo de propiedades
+     * @param ruta
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public static Map<String, Object> cargar_propiedades(String ruta, oks ok, Object ... extras_array) throws Exception {
         try {
-            if (ok.es == false) { return false; }
+            if (ok.es == false) { return null; }
             InputStream inputStream;
             Properties properties;
             properties = new Properties();
             inputStream = Resources.getResourceAsStream(ruta, ok);
             properties.load(inputStream);
             Set<Entry<Object, Object>> objetos_set = properties.entrySet();
-            control_selecciones_mapa = new TreeMap<>();
+            Map<String, Object> control_selecciones_mapa = new TreeMap<>();
             Object clave_objeto;
             for (Entry<Object, Object> entry: objetos_set) {
                 clave_objeto = entry.getKey();
@@ -222,10 +245,10 @@ public class control_selecciones extends control_entradas {
                     control_selecciones_mapa.put(clave_objeto.toString(), entry.getValue());
                 }
             }
+            return control_selecciones_mapa;
         } catch (Exception e) {
             throw e;
         }
-        return ok.es;
     }
     
     public Object leer_seleccion(oks ok, Object ... extras_array) throws Exception {

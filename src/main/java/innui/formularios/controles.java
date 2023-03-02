@@ -2,6 +2,7 @@ package innui.formularios;
 
 import innui.bases;
 import innui.modelos.errores.oks;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,8 +13,10 @@ public class controles extends bases {
     public static String k_in_ruta = "in/innui/formularios/in";
     public static String k_opciones_mapa_no_requerido = "no_requerido";
     public formularios _formulario = null;
-    public String _control_tipo = null;
+    public String _control_tipo = "";
     public Object valor = null;
+    public Object valor_de_captura = null;
+    public Object valor_de_conversion = null;
     public String clave = null;
     public String mensaje_de_captura = null;
     public Map<String, Object> opciones_mapa = null;
@@ -47,12 +50,12 @@ public class controles extends bases {
      */
     public Object _convertir(String modo_operacion, Object objeto_a_convertir, oks ok, Object ... extras_array) throws Exception {
         try {
-            if (ok.es == false) { return false; }
+            if (ok.es == false) { return null; }
             
         } catch (Exception e) {
             throw e;
         }
-        return ok.es;
+        return objeto_a_convertir;
     }
     /**
      * Presenta información antes de capturar información
@@ -99,7 +102,11 @@ public class controles extends bases {
     public boolean iniciar(String tipo_control, oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return ok.es; }
-            _control_tipo = tipo_control;
+            if (tipo_control == null) {
+                _control_tipo = "";
+            } else {
+                _control_tipo = tipo_control;
+            }
         } catch (Exception e) {
             throw e;
         }
@@ -111,7 +118,7 @@ public class controles extends bases {
      * @param objeto_a_capturar
      * @param ok
      * @param extras_array
-     * @return El objeto captuado, o null si hay error.
+     * @return El objeto capturado, o null si hay error.
      * @throws Exception 
      */
     public Object _capturar(String modo_operacion, Object objeto_a_capturar, oks ok, Object ... extras_array) throws Exception {
@@ -158,37 +165,34 @@ public class controles extends bases {
                     _validar(modo_operacion, object, ok, extras_array);
                     if (ok.es == false) { 
                         oks ok_1 = new oks();
-                        _formulario.escribir_linea_error(ok.getTxt(), ok_1);
+                        escribir_linea_error(ok.getTxt(), ok_1);
                         if (ok_1.es == false) { 
                             ok.setTxt(ok.getTxt(), ok_1.getTxt());
                             break; 
+                        } else {
+                            ok.iniciar();
                         }
-                        es_repetir = true; 
+                        es_repetir = hacer_repetir_procesar(ok, extras_array);
                         break;
                     }
                     if (_formulario._es_terminar) {
                         break;
                     }
-                    object = _convertir(modo_operacion, object, ok, extras_array);
+                    valor_de_conversion = _convertir(modo_operacion, object, ok, extras_array);
                     if (ok.es == false) { break; }
-                    if (opciones_mapa.containsKey(k_opciones_mapa_no_requerido) == false) {
-                        if (object == null) {
-                            continue;
-                        } else {
-                            String texto = object.toString();
-                            if (texto.isEmpty()) {
-                                es_repetir = true;
-                                break;
-                            }
-                        }
-                    }
                     break;
                 }
-                oks ok_1 = new oks();
-                object = _terminar(modo_operacion, object, ok_1, extras_array);            
-                if (ok_1.es == false) { 
-                    ok.setTxt(ok.getTxt(), ok_1.getTxt());
-                    break; 
+                object = _terminar(modo_operacion, object, ok, extras_array);
+                if (ok.es == false) { 
+                    oks ok_1 = new oks();
+                    escribir_linea_error(ok.getTxt(), ok_1);
+                    if (ok_1.es == false) { 
+                        ok.setTxt(ok.getTxt(), ok_1.getTxt());
+                        break; 
+                    } else {
+                        ok.iniciar();
+                    }
+                    es_repetir = hacer_repetir_procesar(ok, extras_array);
                 }
                 if (es_repetir == false) {
                     break;
@@ -198,6 +202,15 @@ public class controles extends bases {
             throw e;
         }
         return object;
+    }
+    /**
+     * Activa la repetición del procesamiento del control.
+     * @param ok
+     * @param extras_array
+     * @return 
+     */
+    public boolean hacer_repetir_procesar(oks ok, Object ... extras_array) throws Exception {
+        return true;
     }
     /**
      * Termina los procesos que iniciar dejó abiertos
@@ -236,20 +249,44 @@ public class controles extends bases {
             this.clave = clave;
             this.valor = valor;
             this.mensaje_de_captura = mensaje_de_captura;
-            this.opciones_mapa = opciones_mapa;
-            formulario._poner_control(this, ok, extras_array);            
+            if (opciones_mapa != null) {
+                if (this.opciones_mapa == null) {
+                    this.opciones_mapa = new HashMap<>(opciones_mapa);
+                } else {
+                    this.opciones_mapa.putAll(opciones_mapa);
+                }
+            }
+            if (formulario != null) {
+                formulario._poner_control(this, ok, extras_array);            
+            }
         } catch (Exception e) {
             throw e;
         }
         return ok.es;
     }
 
-    public Object getValor_del_objeto() {
+    public Object getValor() {
         return valor;
     }
 
-    public void setValor_del_objeto(Object valor_del_objeto) {
+    public Object getValor_de_captura() {
+        return valor_de_captura;
+    }
+
+    public Object getValor_de_conversion() {
+        return valor_de_conversion;
+    }
+    /**
+     * Método de poner valor utilizado al importar un formulario.
+     * @param valor_del_objeto
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean importar_captura(Object valor_del_objeto, oks ok, Object ... extras_array) throws Exception {
         this.valor = valor_del_objeto;
+        return ok.es;
     }
 
     public String getNombre() {
@@ -260,4 +297,15 @@ public class controles extends bases {
         this.clave = nombre;
     }
         
+    @Override
+    public boolean escribir_error(String texto, oks ok, Object... extras_array) {
+        _formulario.escribir_error(texto, ok, extras_array);
+        return true;
+    }
+    
+    @Override
+    public boolean escribir_linea_error(String texto, oks ok, Object... extras_array) {
+        _formulario.escribir_linea_error(texto, ok, extras_array);
+        return true;
+    }
 }

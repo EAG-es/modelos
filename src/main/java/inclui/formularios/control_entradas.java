@@ -67,7 +67,7 @@ public class control_entradas extends controles {
      * @return true si hay que utilizar el valor previo, por defecto.
      * @throws Exception 
      */
-    public boolean utilizar_valor_por_defecto(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
+    public boolean _utilizar_valor_por_defecto(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
             if (valor != null) {
@@ -95,7 +95,7 @@ public class control_entradas extends controles {
      * @return true si hay que utilizar el valor previo, por defecto.
      * @throws Exception 
      */
-    public boolean ser_valor_vacio(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
+    public boolean _ser_valor_vacio(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
             if (objeto_a_validar != null) {
@@ -113,6 +113,22 @@ public class control_entradas extends controles {
         return false;
     }    
     /**
+     * Hay que borrar la entrada
+     * @param objeto_a_validar
+     * @param ok
+     * @param extras_array
+     * @return true si hay que utilizar el valor previo, por defecto.
+     * @throws Exception 
+     */
+    public boolean _ser_borrar_entrada(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
+        try {
+            String texto = objeto_a_validar.toString();
+            return texto.equals(k_entradas_codigo_borrar);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+    /**
      * Valida que el objeto obtenido en el control es válido
      * @param modo_operacion
      * @param objeto_a_validar
@@ -127,17 +143,16 @@ public class control_entradas extends controles {
         try {
             if (ok.es == false) { return false; }
             if (modo_operacion.equals(k_fase_procesamiento)) {
-                if (utilizar_valor_por_defecto(objeto_a_validar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_validar, ok, extras_array)) {
                     return true;
                 } else {
                     if (objeto_a_validar != null) {
-                        String texto = objeto_a_validar.toString();
-                        if (texto.equals(k_entradas_codigo_borrar)) {
+                        if (_ser_borrar_entrada(objeto_a_validar, ok, extras_array)) {
                             objeto_a_validar = null;
                         }
                     }
                 }                    
-                if (ser_valor_vacio(objeto_a_validar, ok, extras_array)) {
+                if (_ser_valor_vacio(objeto_a_validar, ok, extras_array)) {
                     if (this.opciones_mapa.containsKey(k_opciones_mapa_no_requerido) == false) {
                         in = ResourceBundles.getBundle(k_in_ruta);
                         ok.setTxt(tr.in(in, "Debe introducir un valor. "));
@@ -210,7 +225,7 @@ public class control_entradas extends controles {
             texto = objeto_a_validar.toString();
             if (texto.equals(k_entradas_cero) || texto.equals(k_entradas_uno)) {
                 return true;
-            } else if (utilizar_valor_por_defecto(texto, ok, extras_array) == false) {
+            } else if (_utilizar_valor_por_defecto(texto, ok, extras_array) == false) {
                 in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "0 = libre, no; 1 = marcado, sí. "), ok);
             }
@@ -357,12 +372,11 @@ public class control_entradas extends controles {
         try {
             if (ok.es == false) { return false; }
             if (modo_operacion.equals(k_fase_procesamiento)) {
-                if (utilizar_valor_por_defecto(objeto_a_convertir, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_convertir, ok, extras_array)) {
                     return valor;
                 } else {
                     if (objeto_a_convertir != null) {
-                        String texto = objeto_a_convertir.toString();
-                        if (texto.equals(k_entradas_codigo_borrar)) {
+                        if (_ser_borrar_entrada(objeto_a_convertir, ok, extras_array)) {
                             objeto_a_convertir = null;
                         }
                     }
@@ -380,7 +394,7 @@ public class control_entradas extends controles {
                         return null;
                     }
                     BigDecimal bigDecimal = null;
-                    if (ser_valor_vacio(objeto_a_convertir, ok, extras_array) == false) {
+                    if (_ser_valor_vacio(objeto_a_convertir, ok, extras_array) == false) {
                         Double doble = Double.valueOf(objeto_a_convertir.toString());
                         bigDecimal = new BigDecimal(doble);
                     }
@@ -406,14 +420,11 @@ public class control_entradas extends controles {
                     Date date;
                     date = patrones.convertir_hora(objeto_a_convertir.toString(), ok);
                     return date;
-                } else if (_control_tipo.equals(k_entradas_tipo_submit)
-                        || _control_tipo.equals(k_entradas_tipo_reset)
-                        || _control_tipo.equals(k_entradas_tipo_con_imagen)
-                        || _control_tipo.equals(k_entradas_tipo_boton)
-                        || _control_tipo.equals(k_entradas_tipo_checkbox)
+                } else if (_control_tipo.equals(k_entradas_tipo_checkbox)
                         || _control_tipo.equals(k_entradas_tipo_radio)) {
-                    Boolean bool;
+                    Object valor_resultante;
                     String texto;
+                    valor_resultante = valor;
                     if (objeto_a_convertir == null) {
                         texto = "";
                     } else {
@@ -421,11 +432,19 @@ public class control_entradas extends controles {
                     }
                     texto = texto.trim();
                     if (texto.equals(k_entradas_cero)) {
-                        bool = false;
+                        if (valor == null) {
+                            valor_resultante = "";
+                        } else if (valor.toString().startsWith(k_entradas_codigo_cancelar) == false) {
+                            valor_resultante = k_entradas_codigo_cancelar + valor.toString();
+                        }
                     } else {
-                        bool = true;
+                        if (valor == null) {
+                            valor_resultante = "";
+                        } else if (valor.toString().startsWith(k_entradas_codigo_cancelar)) {
+                            valor_resultante = valor.toString().replaceFirst(k_entradas_codigo_cancelar, "");
+                        }
                     }
-                    return bool;
+                    return valor_resultante;
                 } else {
                     if (objeto_a_convertir == null) {
                         return "";
@@ -570,7 +589,7 @@ public class control_entradas extends controles {
                 } else {
                     super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                     if (ok.es == false) { return false; }
-                    if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                    if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                         objeto_a_presentar = valor;
                     }
                     if (ok.es == false) { return false; }
@@ -606,7 +625,7 @@ public class control_entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                 if (ok.es == false) { return false; }
-                if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                     objeto_a_presentar = valor;
                 }
                 if (ok.es == false) { return false; }
@@ -642,19 +661,21 @@ public class control_entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                 if (ok.es == false) { return false; }
-                if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                     objeto_a_presentar = valor;
                 }
                 if (ok.es == false) { return false; }
                 String texto;
                 if (objeto_a_presentar == null) { 
                     texto = "";
-                } else if (objeto_a_presentar instanceof String) { 
-                    texto = (String) objeto_a_presentar;
-                } else if ((Boolean) objeto_a_presentar) {
-                    texto = "1";
+                } else if (objeto_a_presentar instanceof Boolean) { 
+                    if ((Boolean) objeto_a_presentar) {
+                        texto = "1";
+                    } else {
+                        texto = "0";
+                    }
                 } else {
-                    texto = "0";
+                    texto = objeto_a_presentar.toString();
                 }
                 _formulario.escribir(k_entradas_codigo_cancelar
                         + " <" + k_entradas_formato_duopcion + ">"
@@ -681,7 +702,7 @@ public class control_entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                 if (ok.es == false) { return false; }
-                if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                     objeto_a_presentar = valor;
                 }
                 if (ok.es == false) { return false; }
@@ -719,7 +740,7 @@ public class control_entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                 if (ok.es == false) { return false; }
-                if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                     objeto_a_presentar = valor;
                 }
                 if (ok.es == false) { return false; }
@@ -757,7 +778,7 @@ public class control_entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                 if (ok.es == false) { return false; }
-                if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                     objeto_a_presentar = valor;
                 }
                 if (ok.es == false) { return false; }
@@ -795,7 +816,7 @@ public class control_entradas extends controles {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
                 if (ok.es == false) { return false; }
-                if (utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
                     objeto_a_presentar = valor;
                 }
                 if (ok.es == false) { return false; }
@@ -816,47 +837,81 @@ public class control_entradas extends controles {
         }
         return ok.es;
     }
-    /**
-     * Procesa la información capturada
-     * @param modo_operacion
-     * @param objeto_a_procesar puede ser nulo (si no es solo_procesa_control)
-     * @param ok
-     * @param extras_array
-     * @return Un objeto resultante de procesar, o null si hay error.
-     * @throws Exception 
-     */
+    
     @Override
-    public Object procesar(String modo_operacion, Object objeto_a_procesar, oks ok, Object ... extras_array) throws Exception {
-        Object object = null;
+    public Object _terminar(String modo_operacion, Object objeto_a_terminar, oks ok, Object ... extras_array) throws Exception {
         try {
+            if (ok.es == false) { return null; }
             if (modo_operacion.equals(k_fase_procesamiento)) {
-                object = super.procesar(modo_operacion, objeto_a_procesar, ok, extras_array);
-                if (ok.es) {
-                    if (_control_tipo.equals(k_entradas_tipo_submit)) {
-                        if((Boolean) object) {
-                            _formulario.terminar(ok, extras_array);
-                        } else {
-                            _formulario.cancelar(ok, extras_array);
-                        }
-                    } else if (_control_tipo.equals(k_entradas_tipo_reset)
-                           && (Boolean) object) {
-                            _formulario.repetir(ok, extras_array);
-                    }
+                objeto_a_terminar = valor_de_conversion;
+                if (_control_tipo.equals(k_entradas_tipo_submit)) {
+                    post_procesar_submit(objeto_a_terminar, ok, extras_array);
+                } else if (_control_tipo.equals(k_entradas_tipo_reset)) {
+                    post_procesar_reset(objeto_a_terminar, ok, extras_array);
                 }
-            } else {
-                object = super.procesar(modo_operacion, objeto_a_procesar, ok, extras_array);
             }
         } catch (Exception e) {
             throw e;
         }
-        return object;
+        return objeto_a_terminar;
+    }
+    
+    /**
+     * Implementa el comportamiento del botón submit
+     * @param objeto_a_procesar
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean post_procesar_submit(Object objeto_a_procesar, oks ok, Object ... extras_array) throws Exception {
+        try {
+            if (ok.es == false) { return false; }
+            if (objeto_a_procesar == null) {
+                _formulario.cancelar(ok, extras_array);
+            } else {
+                String texto;
+                texto = objeto_a_procesar.toString();
+                if(texto.equals(k_entradas_uno)) {
+                    _formulario.terminar(ok, extras_array);
+                } else {
+                    _formulario.cancelar(ok, extras_array);
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return ok.es;
+    }
+    /**
+     * Implementa el comportamiento del botón reset
+     * @param objeto_a_procesar
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean post_procesar_reset(Object objeto_a_procesar, oks ok, Object ... extras_array) throws Exception {
+        try {
+            if (ok.es == false) { return false; }
+            if (objeto_a_procesar != null) {
+                String texto;
+                texto = objeto_a_procesar.toString();
+                if(texto.equals(k_entradas_uno)) {
+                    _formulario.repetir(ok, extras_array);
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return ok.es;
     }
     /**
      * Conecta un control con un formulario
      * @param formulario Formulario donde incorporar el control (por orden de inclusión)
      * @param clave Nombre identificador del formulario (en un grupo exclusivo el clave puede repetirse)
      * @param valor Valor inicial (puede ser null)
-     * @param mensaje_de_captura Mensaje que presentar en la captura
+     * @param mensaje_de_captura Mensaje que presentar en la valor_de_captura
      * @param opciones_mapa Opciones que va a utilizar el control en algunas de sus fases (puede ser null)
      * @param ok
      * @param extras_array
@@ -875,6 +930,8 @@ public class control_entradas extends controles {
                     in = ResourceBundles.getBundle(k_in_ruta);
                     ok.id = k_entradas_clui_lectura;
                     ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_entradas_clui_lectura);
+                } else {
+                    this.opciones_mapa.remove(k_entradas_clui_lectura);
                 }
             }
         } catch (Exception e) {
