@@ -13,7 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.ResourceBundle;
 
 /**
@@ -22,32 +22,41 @@ import java.util.ResourceBundle;
  */
 public class clabs extends bases {
     public static String k_in_ruta = "in/innui/modelos/jdbc/in";
+    public static String k_clabs_id_error_crear = "clabs_id_error_crear";
+    public static String k_clabs_id_error_leer = "clabs_id_error_leer";
+    public static String k_clabs_id_error_actualizar = "clabs_id_error_actualizar";
+    public static String k_clabs_id_error_borrar = "clabs_id_error_borrar";
     public Connection connection = null;
     
     /**
      * Devuelve una lista con las filas de la tabla productos 
-     * @param jdbc_peticion
+     * @param sql_comando
      * @param ok
      * @param extra_array
      * @return null si hay error, una lista de productos si no hay error
      * @throws java.lang.Exception
      */
-    public boolean leer(sql_comandos jdbc_peticion, oks ok, Object... extra_array) throws Exception {
+    public boolean leer(sql_comandos sql_comando, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         ResourceBundle in;
-        String sql_comando;
-        sql_comando = jdbc_peticion.getLeer_sql();
-        Map<String, Object> columnas_mapa;
+        String comando;
+        comando = sql_comando.getLeer_sql();
+        LinkedHashMap<String, Object> columnas_mapa;
         Object object;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql_comando)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                jdbc_peticion.crear_lecturas_lista(ok, extra_array);
+                sql_comando.crear_lecturas_lista(ok, extra_array);
                 if (ok.es == false) { return false; }
                 while (resultSet.next() ) {
                     int i = 1;
-                    columnas_mapa = jdbc_peticion.crear_columnas_mapa(ok);
+                    columnas_mapa = sql_comando.crear_columnas_mapa(ok);
                     if (ok.es == false) { break; }
-                    for(String nombre: jdbc_peticion.columnas_leer_lista) {
+                    if (sql_comando.columnas_leer_lista == null) {
+                        in = ResourceBundles.getBundle(k_in_ruta);
+                        ok.setTxt(tr.in(in, "Error, no se han definido las columnas que leer. "));
+                        break;
+                    }
+                    for(String nombre: sql_comando.columnas_leer_lista) {
                         object = resultSet.getObject(i);
                         if (resultSet.wasNull()) {
                             object = null;
@@ -55,133 +64,154 @@ public class clabs extends bases {
                         columnas_mapa.put(nombre, object);
                         i = i + 1;
                     }
-                    jdbc_peticion.lecturas_lista.add(columnas_mapa);
+                    sql_comando.lecturas_lista.add(columnas_mapa);
                 }
             } catch (Exception e) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error al leer: ") + sql_comando, e);
+                ok.setTxt(tr.in(in, "Error al leer: ") + comando, e);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "Error al leer: ") + sql_comando, e);
+            ok.setTxt(tr.in(in, "Error al leer: ") + comando, e);
+        }
+        if (ok.es == false) {
+            sql_comando.error_msg = ok.getTxt();
+            sql_comando.error_id = k_clabs_id_error_leer;
         }
         return ok.es;
     }
     /**
      * Borra un registro, si es posible (no hay restricciones de integridad)
-     * @param jdbc_peticion
+     * @param sql_comando
      * @param ok
      * @param extra_array
      * @return 
      * @throws java.lang.Exception 
      */
-    public boolean borrar(sql_comandos jdbc_peticion, oks ok, Object... extra_array) throws Exception {
+    public boolean borrar(sql_comandos sql_comando, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         ResourceBundle in;
-        String sql_comando;
-        sql_comando = jdbc_peticion.borrar_sql;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql_comando)) {
+        String comando;
+        comando = sql_comando.borrar_sql;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             int row = preparedStatement.executeUpdate();
             if (row != 1) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error al borrar: ") + sql_comando);
+                ok.setTxt(tr.in(in, "Error al borrar: ") + comando);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "Error al borrar: ") + sql_comando, e);
+            ok.setTxt(tr.in(in, "Error al borrar: ") + comando, e);
+        }
+        if (ok.es == false) {
+            sql_comando.error_msg = ok.getTxt();
+            sql_comando.error_id = k_clabs_id_error_borrar;
         }
         return ok.es;
     }
     /**
      * Crear (inserta) una nueva fila
-     * @param jdbc_peticion
+     * @param sql_comando
      * @param ok
      * @param extra_array
      * @return
      * @throws Exception 
      */
-    public boolean crear(sql_comandos jdbc_peticion, oks ok, Object... extra_array) throws Exception {
+    public boolean crear(sql_comandos sql_comando, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         ResourceBundle in;
-        String sql_comando;
-        sql_comando = jdbc_peticion.crear_sql;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql_comando)) {
+        String comando;
+        comando = sql_comando.crear_sql;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             int row = preparedStatement.executeUpdate();
             if (row != 1) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error al crear: ") + sql_comando);
+                ok.setTxt(tr.in(in, "Error al crear: ") + comando);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "Error al crear: ") + sql_comando, e);
+            ok.setTxt(tr.in(in, "Error al crear: ") + comando, e);
+        }
+        if (ok.es == false) {
+            sql_comando.error_msg = ok.getTxt();
+            sql_comando.error_id = k_clabs_id_error_crear;
         }
         return ok.es;
     }
 
     /**
      * Crear (inserta) una nueva fila y obtiene las nuevas claves autogeneradas
-     * @param jdbc_peticion
+     * @param sql_comando
      * @param ok
      * @param extra_array
      * @return
      * @throws Exception 
      */
-    public boolean crear_auto(sql_comandos jdbc_peticion, oks ok, Object... extra_array) throws Exception {
+    public boolean crear_auto(sql_comandos sql_comando, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         ResourceBundle in;
-        String sql_comando;
-        Map<String, Object> columnas_mapa;
+        String comando;
         Object object;
-        sql_comando = jdbc_peticion.crear_sql;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql_comando, Statement.RETURN_GENERATED_KEYS)) {
+        comando = sql_comando.crear_sql;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(comando, Statement.RETURN_GENERATED_KEYS)) {
             int row = preparedStatement.executeUpdate();
             if (row != 1) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error al crear: ") + sql_comando);
+                ok.setTxt(tr.in(in, "Error al crear: ") + comando);
             }
             int i = 1;
             try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-                jdbc_peticion.crear_lecturas_nueva_clave_lista(ok, extra_array);
-                if (ok.es == false) { return false; }
                 while (resultSet.next() ) {
                     i = 1;
-                    columnas_mapa = jdbc_peticion.crear_columnas_mapa(ok);
+                    sql_comando.clave_nueva_mapa = sql_comando.crear_columnas_mapa(ok);
                     if (ok.es == false) { break; }
-                    for(String nombre: jdbc_peticion.columnas_leer_clave_nueva_lista) {
+                    if (sql_comando.columnas_leer_clave_nueva_lista == null) {
+                        in = ResourceBundles.getBundle(k_in_ruta);
+                        ok.setTxt(tr.in(in, "Error, no se han definido las columnas de la clave primaria auto. "));
+                        break;
+                    }
+                    for(String nombre: sql_comando.columnas_leer_clave_nueva_lista) {
                         object = resultSet.getObject(i);
                         if (resultSet.wasNull()) {
                             object = null;
                         }
-                        columnas_mapa.put(nombre, object);
+                        sql_comando.clave_nueva_mapa.put(nombre, object);
                         i = i + 1;
                     }
-                    jdbc_peticion.lecturas_nueva_clave_lista.add(columnas_mapa);
                 }
             } catch (Exception e) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error al recuperar la clave creada: ") + sql_comando, e);
+                ok.setTxt(tr.in(in, "Error al recuperar la clave creada: ") + comando, e);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "Error al crear: ") + sql_comando, e);
+            ok.setTxt(tr.in(in, "Error al crear: ") + comando, e);
+        }
+        if (ok.es == false) {
+            sql_comando.error_msg = ok.getTxt();
+            sql_comando.error_id = k_clabs_id_error_crear;
         }
         return ok.es;
     }
 
-    public boolean actualizar(sql_comandos jdbc_peticion, oks ok, Object... extra_array) throws Exception {
+    public boolean actualizar(sql_comandos sql_comando, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         ResourceBundle in;
-        String sql_comando;
-        sql_comando = jdbc_peticion.actualizar_sql;
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql_comando)) {
+        String comando;
+        comando = sql_comando.actualizar_sql;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             int row = preparedStatement.executeUpdate();
             if (row != 1) {
                 in = ResourceBundles.getBundle(k_in_ruta);
-                ok.setTxt(tr.in(in, "Error al actualizar: ") + sql_comando);
+                ok.setTxt(tr.in(in, "Error al actualizar: ") + comando);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "Error al actualizar: ") + sql_comando, e);
+            ok.setTxt(tr.in(in, "Error al actualizar: ") + comando, e);
+        }
+        if (ok.es == false) {
+            sql_comando.error_msg = ok.getTxt();
+            sql_comando.error_id = k_clabs_id_error_actualizar;
         }
         return ok.es;
     }
