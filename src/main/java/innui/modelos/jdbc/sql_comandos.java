@@ -10,6 +10,7 @@ import java.sql.Time;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -29,35 +30,35 @@ public class sql_comandos {
     public static String k_sql_comandos_formato_time = "%1$tT:%1$tL";
     public String clase_driver_jdbc;
     public String clase_driver_jdbc_uri_conexion;
-    public String crear_sql;
-    public String leer_sql;
-    public String actualizar_sql;
-    public String borrar_sql;
-    public String _leer_sql;
-    public LinkedList<String> columnas_leer_lista;
-    public LinkedList<String> columnas_leer_clave_nueva_lista;
+    public String creacion_sql;
+    public String lectura_sql;
+    public String actualizacion_sql;
+    public String borrado_sql;
+    public String _lectura_sql;
+    public LinkedList<String> lectura_columnas_lista;
+    public LinkedList<String> clave_nueva_columnas_lista;
     public LinkedList<LinkedHashMap<String, Object>> lecturas_lista;
     public LinkedHashMap<String, Object> clave_nueva_mapa;
     public Map<String, Object> peticiones_mapa;
-    public String error_msg;
-    public String error_id;
     /**
      * Crea la lista de columnas que se van a leer.
      * @param ok
-     * @param extra_array Nombres de las columnas que poner en la lista
+     * @param extra_array Nombres de las columnas que poner en la lista (pueden contener la palabra clave alias, o ser una funcion (se toma el último nombre (el espacio en blanco es el separador)))
      * @return
      * @throws Exception 
      */
-    public boolean crear_columnas_leer_lista(oks ok, Object... extra_array) throws Exception {
+    public boolean leer_crear_lectura_columnas_lista(oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         try {
-            if (columnas_leer_lista == null) {
-                columnas_leer_lista = new LinkedList<>();
+            if (lectura_columnas_lista == null) {
+                lectura_columnas_lista = new LinkedList<>();
             } else {
-                columnas_leer_lista.clear();
+                lectura_columnas_lista.clear();
             }
+            String [] nombres_array;
             for (Object object: extra_array) {
-                columnas_leer_lista.add(object.toString());
+                nombres_array = object.toString().trim().split("\\s+");
+                lectura_columnas_lista.add(nombres_array[nombres_array.length-1]);
             }
         } catch (Exception e) {
             ok.setTxt(e);
@@ -67,20 +68,20 @@ public class sql_comandos {
     /**
      * Crea la lista de columnas de una clave nueva automática creada.
      * @param ok
-     * @param extra_array Nombres de las columnas que poner en la lista
+     * @param extra_array Nombres de las columnas que poner en la lista (un nombre por columna)
      * @return
      * @throws Exception 
      */
-    public boolean crear_columnas_leer_clave_nueva_lista(oks ok, Object... extra_array) throws Exception {
+    public boolean crear_clave_nueva_columnas_lista(oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         try {
-            if (columnas_leer_clave_nueva_lista == null) {
-                columnas_leer_clave_nueva_lista = new LinkedList<>();
+            if (clave_nueva_columnas_lista == null) {
+                clave_nueva_columnas_lista = new LinkedList<>();
             } else {
-                columnas_leer_clave_nueva_lista.clear();
+                clave_nueva_columnas_lista.clear();
             }
             for (Object object: extra_array) {
-                columnas_leer_clave_nueva_lista.add(object.toString());
+                clave_nueva_columnas_lista.add(object.toString());
             }
         } catch (Exception e) {
             ok.setTxt(e);
@@ -94,7 +95,7 @@ public class sql_comandos {
      * @return
      * @throws Exception 
      */
-    public boolean crear_lecturas_lista(oks ok, Object... extra_array) throws Exception {
+    public boolean leer_crear_lecturas_lista(oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         try {
             if (lecturas_lista == null) {
@@ -126,26 +127,21 @@ public class sql_comandos {
     }
     /**
      * Valida y completa las instrucciones CLAB, antes de pasarle los datos en k_sql_comandos_marcador_para_valor
+     * @param comando
      * @param ok
      * @param extra_array
      * @return
      * @throws Exception 
      */
-    public boolean iniciar(oks ok, Object... extra_array) throws Exception {
+    public boolean leer_iniciar(String comando, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return false; }
         ResourceBundle in;
         try {
             String texto;
             String columnas_tex;
             in = ResourceBundles.getBundle(k_in_ruta);
-            texto = crear_sql;
-            if (texto != null) {
-                texto = texto.toLowerCase().trim();
-                if (texto.contains(k_sql_comandos_insert) == false) {
-                    ok.setTxt(ok.getTxt(), tr.in(in, "Se esperaba una orden: ") + k_sql_comandos_insert);
-                }
-            }
-            texto = leer_sql;
+            lectura_sql = comando;
+            texto = lectura_sql;
             if (texto != null) {
                 texto = texto.toLowerCase().trim();
                 if (texto.contains(k_sql_comandos_select) == false) {
@@ -154,17 +150,89 @@ public class sql_comandos {
                 if (texto.contains(" " + k_sql_comandos_marcador_columnas_lista + " ") == false) {
                     ok.setTxt(ok.getTxt(), tr.in(in, "Falta el marcador para la lista de columnas: ") + k_sql_comandos_marcador_columnas_lista);
                 }
-                columnas_tex = "";
-                for (String columna: columnas_leer_lista) {
-                    if (columnas_tex.isBlank()) {
-                        columnas_tex = columnas_tex + columna;
-                    } else {
-                        columnas_tex = columnas_tex + ", " + columna;
+                if (lectura_columnas_lista == null) {
+                    in = ResourceBundles.getBundle(k_in_ruta);
+                    ok.setTxt(tr.in(in, "Error, no se han definido las columnas que leer. "));
+                } else {
+                    columnas_tex = "";
+                    for (String columna: lectura_columnas_lista) {
+                        if (columnas_tex.isBlank()) {
+                            columnas_tex = columnas_tex + columna;
+                        } else {
+                            columnas_tex = columnas_tex + ", " + columna;
+                        }
                     }
+                    _lectura_sql = texto.replace(k_sql_comandos_marcador_columnas_lista, columnas_tex);
                 }
-                _leer_sql = texto.replace(k_sql_comandos_marcador_columnas_lista, columnas_tex);
             }
-            texto = borrar_sql;
+        } catch (Exception e) {
+            ok.setTxt(e);
+        }
+        return ok.es;
+    }
+    /**
+     * Valida y completa las instrucciones CLAB, antes de pasarle los datos en k_sql_comandos_marcador_para_valor
+     * @param comando
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean crear_iniciar(String comando, oks ok, Object... extra_array) throws Exception {
+        if (ok.es == false) { return false; }
+        ResourceBundle in;
+        try {
+            String texto;
+            String columnas_tex;
+            in = ResourceBundles.getBundle(k_in_ruta);
+            creacion_sql = comando;
+            texto = creacion_sql;
+            if (texto != null) {
+                texto = texto.toLowerCase().trim();
+                if (texto.contains(k_sql_comandos_insert) == false) {
+                    ok.setTxt(ok.getTxt(), tr.in(in, "Se esperaba una orden: ") + k_sql_comandos_insert);
+                }
+            }
+        } catch (Exception e) {
+            ok.setTxt(e);
+        }
+        return ok.es;
+    }
+    /**
+     * Valida y completa las instrucciones CLAB, antes de pasarle los datos en k_sql_comandos_marcador_para_valor
+     * @param comando
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean actualizar_iniciar(String comando, oks ok, Object... extra_array) throws Exception {
+        if (ok.es == false) { return false; }
+        ResourceBundle in;
+        try {
+            in = ResourceBundles.getBundle(k_in_ruta);
+            actualizacion_sql = comando;
+        } catch (Exception e) {
+            ok.setTxt(e);
+        }
+        return ok.es;
+    }
+    /**
+     * Valida y completa las instrucciones CLAB, antes de pasarle los datos en k_sql_comandos_marcador_para_valor
+     * @param comando
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean borrar_iniciar(String comando, oks ok, Object... extra_array) throws Exception {
+        if (ok.es == false) { return false; }
+        ResourceBundle in;
+        try {
+            String texto;
+            in = ResourceBundles.getBundle(k_in_ruta);
+            borrado_sql = comando;
+            texto = borrado_sql;
             if (texto != null) {
                 texto = texto.toLowerCase().trim();
                 if (texto.contains(k_sql_comandos_delete) == false) {
@@ -174,15 +242,11 @@ public class sql_comandos {
         } catch (Exception e) {
             ok.setTxt(e);
         }
-        if (ok.es == false) {
-            error_msg = ok.getTxt();
-            error_id = k_sql_comandos_id_error_iniciar;
-        }
         return ok.es;
     }
 
     public String getLeer_sql() {
-        return _leer_sql;
+        return _lectura_sql;
     }
     /**
      * Completa las marcas k_sql_comandos_marcador_para_valor de una instrucción SQL, con los valores correspondientes
@@ -233,9 +297,31 @@ public class sql_comandos {
                 inicio_busqueda_pos = inicio_busqueda_pos + 1;
                 i = i + 1;
             }
+            if (ok.es == false) { return null; }
             texto = texto.substring(0, inicio_busqueda_pos - 1)
-            + pasar_a_texto_sql_segun_tipo(valor, ok)
+            + _pasar_a_texto_sql_segun_tipo(valor, ok)
             + texto.substring(inicio_busqueda_pos - 1 + k_sql_comandos_marcador_para_valor.length());
+        } catch (Exception e) {
+            ok.setTxt(e);
+        }
+        return texto;
+    }
+    /**
+     * Completa las marcas k_sql_comandos_marcador_para_valor de una instrucción SQL, con los valores correspondientes
+     * @param texto Texto donde poner el valor
+     * @param valores_lista Valores que poner (en función de su clase)
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public String _poner_valor_en_marcas(String texto, List<Object> valores_lista, oks ok, Object... extra_array) throws Exception {
+        if (ok.es == false) { return null; }
+        try {
+            if (ok.es == false) { return null; }
+            for (Object valor: valores_lista) {
+                texto = _poner_valor_en_marcas(texto, valor, ok, extra_array);
+            }
         } catch (Exception e) {
             ok.setTxt(e);
         }
@@ -249,7 +335,7 @@ public class sql_comandos {
      * @return
      * @throws Exception 
      */
-    public String pasar_a_texto_sql_segun_tipo(Object valor, oks ok, Object... extra_array) throws Exception {
+    public String _pasar_a_texto_sql_segun_tipo(Object valor, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return null; }
         String texto = null;
         try {
@@ -289,8 +375,28 @@ public class sql_comandos {
      * @return
      * @throws Exception 
      */
-    public boolean poner_valor_crear(Object valor, oks ok, Object... extra_array) throws Exception {
-        crear_sql = _poner_valor_en_marcas(crear_sql, valor, ok, extra_array);
+    public boolean crear_poner_valor(Object valor, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(creacion_sql, valor, ok, extra_array);
+        if (ok.es) {
+            creacion_sql = texto;
+        }
+        return ok.es;
+    }
+    /**
+     * Completa las marcas k_sql_comandos_marcador_para_valor de una instrucción SQL, con los valores correspondientes
+     * @param valores_lista Valor que poner (en función de su clase)
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean crear_poner_valor(List<Object> valores_lista, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(creacion_sql, valores_lista, ok, extra_array);
+        if (ok.es) {
+            creacion_sql = texto;
+        }
         return ok.es;
     }
     /**
@@ -301,8 +407,28 @@ public class sql_comandos {
      * @return
      * @throws Exception 
      */
-    public boolean poner_valor_leer(Object valor, oks ok, Object... extra_array) throws Exception {
-        _leer_sql = _poner_valor_en_marcas(_leer_sql, valor, ok, extra_array);
+    public boolean leer_poner_valor(Object valor, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(_lectura_sql, valor, ok, extra_array);
+        if (ok.es) {
+            _lectura_sql = texto;
+        }
+        return ok.es;
+    }
+    /**
+     * Completa las marcas k_sql_comandos_marcador_para_valor de una instrucción SQL, con los valores correspondientes
+     * @param valores_lista Valor que poner (en función de su clase)
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean leer_poner_valor(List<Object> valores_lista, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(_lectura_sql, valores_lista, ok, extra_array);
+        if (ok.es) {
+            _lectura_sql = texto;
+        }
         return ok.es;
     }
     /**
@@ -313,8 +439,28 @@ public class sql_comandos {
      * @return
      * @throws Exception 
      */
-    public boolean poner_valor_actualizar(Object valor, oks ok, Object... extra_array) throws Exception {
-        actualizar_sql = _poner_valor_en_marcas(actualizar_sql, valor, ok, extra_array);
+    public boolean actualizar_poner_valor(Object valor, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(actualizacion_sql, valor, ok, extra_array);
+        if (ok.es) {
+            actualizacion_sql = texto;
+        }
+        return ok.es;
+    }
+    /**
+     * Completa las marcas k_sql_comandos_marcador_para_valor de una instrucción SQL, con los valores correspondientes
+     * @param valores_lista Valor que poner (en función de su clase)
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean actualizar_poner_valor(List<Object> valores_lista, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(actualizacion_sql, valores_lista, ok, extra_array);
+        if (ok.es) {
+            actualizacion_sql = texto;
+        }
         return ok.es;
     }
     /**
@@ -325,8 +471,28 @@ public class sql_comandos {
      * @return
      * @throws Exception 
      */
-    public boolean poner_valor_borrar(Object valor, oks ok, Object... extra_array) throws Exception {
-        borrar_sql = _poner_valor_en_marcas(borrar_sql, valor, ok, extra_array);
+    public boolean borrar_poner_valor(Object valor, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(borrado_sql, valor, ok, extra_array);
+        if (ok.es) {
+            borrado_sql = texto;
+        }
+        return ok.es;
+    }
+    /**
+     * Completa las marcas k_sql_comandos_marcador_para_valor de una instrucción SQL, con los valores correspondientes
+     * @param valores_lista Valor que poner (en función de su clase)
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean borrar_poner_valor(List<Object> valores_lista, oks ok, Object... extra_array) throws Exception {
+        String texto;
+        texto = _poner_valor_en_marcas(borrado_sql, valores_lista, ok, extra_array);
+        if (ok.es) {
+            borrado_sql = texto;
+        }
         return ok.es;
     }
 }

@@ -45,18 +45,18 @@ public class clabs extends bases {
         Object object;
         try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                sql_comando.crear_lecturas_lista(ok, extra_array);
+                sql_comando.leer_crear_lecturas_lista(ok, extra_array);
                 if (ok.es == false) { return false; }
                 while (resultSet.next() ) {
                     int i = 1;
                     columnas_mapa = sql_comando.crear_columnas_mapa(ok);
                     if (ok.es == false) { break; }
-                    if (sql_comando.columnas_leer_lista == null) {
+                    if (sql_comando.lectura_columnas_lista == null) {
                         in = ResourceBundles.getBundle(k_in_ruta);
                         ok.setTxt(tr.in(in, "Error, no se han definido las columnas que leer. "));
                         break;
                     }
-                    for(String nombre: sql_comando.columnas_leer_lista) {
+                    for(String nombre: sql_comando.lectura_columnas_lista) {
                         object = resultSet.getObject(i);
                         if (resultSet.wasNull()) {
                             object = null;
@@ -74,10 +74,6 @@ public class clabs extends bases {
             in = ResourceBundles.getBundle(k_in_ruta);
             ok.setTxt(tr.in(in, "Error al leer: ") + comando, e);
         }
-        if (ok.es == false) {
-            sql_comando.error_msg = ok.getTxt();
-            sql_comando.error_id = k_clabs_id_error_leer;
-        }
         return ok.es;
     }
     /**
@@ -92,20 +88,16 @@ public class clabs extends bases {
         if (ok.es == false) { return false; }
         ResourceBundle in;
         String comando;
-        comando = sql_comando.borrar_sql;
+        comando = sql_comando.borrado_sql;
         try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             int row = preparedStatement.executeUpdate();
-            if (row != 1) {
+            if (row <= 0) {
                 in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error al borrar: ") + comando);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
             ok.setTxt(tr.in(in, "Error al borrar: ") + comando, e);
-        }
-        if (ok.es == false) {
-            sql_comando.error_msg = ok.getTxt();
-            sql_comando.error_id = k_clabs_id_error_borrar;
         }
         return ok.es;
     }
@@ -121,7 +113,7 @@ public class clabs extends bases {
         if (ok.es == false) { return false; }
         ResourceBundle in;
         String comando;
-        comando = sql_comando.crear_sql;
+        comando = sql_comando.creacion_sql;
         try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             int row = preparedStatement.executeUpdate();
             if (row != 1) {
@@ -131,10 +123,6 @@ public class clabs extends bases {
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
             ok.setTxt(tr.in(in, "Error al crear: ") + comando, e);
-        }
-        if (ok.es == false) {
-            sql_comando.error_msg = ok.getTxt();
-            sql_comando.error_id = k_clabs_id_error_crear;
         }
         return ok.es;
     }
@@ -152,7 +140,7 @@ public class clabs extends bases {
         ResourceBundle in;
         String comando;
         Object object;
-        comando = sql_comando.crear_sql;
+        comando = sql_comando.creacion_sql;
         try (PreparedStatement preparedStatement = connection.prepareStatement(comando, Statement.RETURN_GENERATED_KEYS)) {
             int row = preparedStatement.executeUpdate();
             if (row != 1) {
@@ -165,12 +153,12 @@ public class clabs extends bases {
                     i = 1;
                     sql_comando.clave_nueva_mapa = sql_comando.crear_columnas_mapa(ok);
                     if (ok.es == false) { break; }
-                    if (sql_comando.columnas_leer_clave_nueva_lista == null) {
+                    if (sql_comando.clave_nueva_columnas_lista == null) {
                         in = ResourceBundles.getBundle(k_in_ruta);
                         ok.setTxt(tr.in(in, "Error, no se han definido las columnas de la clave primaria auto. "));
                         break;
                     }
-                    for(String nombre: sql_comando.columnas_leer_clave_nueva_lista) {
+                    for(String nombre: sql_comando.clave_nueva_columnas_lista) {
                         object = resultSet.getObject(i);
                         if (resultSet.wasNull()) {
                             object = null;
@@ -187,10 +175,6 @@ public class clabs extends bases {
             in = ResourceBundles.getBundle(k_in_ruta);
             ok.setTxt(tr.in(in, "Error al crear: ") + comando, e);
         }
-        if (ok.es == false) {
-            sql_comando.error_msg = ok.getTxt();
-            sql_comando.error_id = k_clabs_id_error_crear;
-        }
         return ok.es;
     }
 
@@ -198,20 +182,16 @@ public class clabs extends bases {
         if (ok.es == false) { return false; }
         ResourceBundle in;
         String comando;
-        comando = sql_comando.actualizar_sql;
+        comando = sql_comando.actualizacion_sql;
         try (PreparedStatement preparedStatement = connection.prepareStatement(comando)) {
             int row = preparedStatement.executeUpdate();
-            if (row != 1) {
+            if (row <= 0) {
                 in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "Error al actualizar: ") + comando);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
             ok.setTxt(tr.in(in, "Error al actualizar: ") + comando, e);
-        }
-        if (ok.es == false) {
-            sql_comando.error_msg = ok.getTxt();
-            sql_comando.error_id = k_clabs_id_error_actualizar;
         }
         return ok.es;
     }
