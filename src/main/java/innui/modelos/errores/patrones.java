@@ -3,6 +3,10 @@ package innui.modelos.errores;
 import innui.bases;
 import innui.modelos.configuraciones.ResourceBundles;
 import innui.modelos.internacionalizacion.tr;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -440,6 +444,108 @@ public class patrones extends bases {
             throw e;
         }
         return ok.es;
+    }
+    /**
+     * Valida un entero con el formatos k_patrones_telefono
+     * @param texto
+     * @param es_agrupador_permitido
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public static boolean validar_numero(String texto, boolean es_agrupador_permitido, oks ok, Object ... extras_array) throws Exception {
+        convertir_numero(texto, es_agrupador_permitido, ok, extras_array);
+        return ok.es;
+    }
+    /**
+     * Convertir un texto a un número entero con el formatos k_patrones_telefono
+     * @param texto
+     * @param es_agrupador_permitido
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public static Long convertir_numero(String texto, boolean es_agrupador_permitido, oks ok, Object ... extras_array) throws Exception {
+        Long num_largo = null;
+        ResourceBundle in;
+        try {
+            if (ok.es == false) { return null; }
+            NumberFormat numberFormat = NumberFormat.getInstance();
+            ParsePosition parsePosition = new ParsePosition(0);
+            numberFormat.setGroupingUsed(false);
+            Number number = numberFormat.parse(texto, parsePosition);
+            if (parsePosition.getErrorIndex() != -1
+             || parsePosition.getIndex() != texto.length()) {
+                in = ResourceBundles.getBundle(k_in_ruta);
+                if (es_agrupador_permitido) {
+                    ok.setTxt(tr.in(in, "Error, no es un entero decimal válido "));
+                } else {
+                    ok.setTxt(tr.in(in, "Error, no es un entero decimal válido (no use agrupador de dígitos) "));
+                }
+            }
+            num_largo = number.longValue();
+        } catch (Exception e) {
+            in = ResourceBundles.getBundle(k_in_ruta);
+            if (es_agrupador_permitido) {
+                ok.setTxt(tr.in(in, "Error, no es un entero decimal válido "));
+            } else {
+                ok.setTxt(tr.in(in, "Error, no es un entero decimal válido (no use agrupador de dígitos) "));
+            }
+        }
+        return num_largo;
+    }
+    /**
+     * Valida un decimal con el formatos k_patrones_telefono
+     * @param texto
+     * @param es_agrupador_permitido
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public static boolean validar_decimal(String texto, boolean es_agrupador_permitido, oks ok, Object ... extras_array) throws Exception {
+        convertir_decimal(texto, es_agrupador_permitido, ok, extras_array);
+        return ok.es;
+    }
+    /**
+     * Convertir un texto a un número decimal con el formatos k_patrones_telefono
+     * @param texto
+     * @param es_agrupador_permitido
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public static Double convertir_decimal(String texto, boolean es_agrupador_permitido, oks ok, Object ... extras_array) throws Exception {
+        Double doble = null;
+        ResourceBundle in;
+        try {
+            if (ok.es == false) { return null; }
+            NumberFormat decimalFormat = DecimalFormat.getInstance();
+            ParsePosition parsePosition = new ParsePosition(0);
+            decimalFormat.setGroupingUsed(es_agrupador_permitido);
+            Number number = decimalFormat.parse(texto, parsePosition);
+            if (parsePosition.getErrorIndex() != -1
+             || parsePosition.getIndex() != texto.length()) {
+                in = ResourceBundles.getBundle(k_in_ruta);
+                if (es_agrupador_permitido) {
+                    ok.setTxt(tr.in(in, "Error, no es un número decimal válido "));
+                } else {
+                    ok.setTxt(tr.in(in, "Error, no es un número decimal válido (no use agrupador de dígitos) "));
+                }
+            }
+            doble = number.doubleValue();
+        } catch (Exception e) {
+            in = ResourceBundles.getBundle(k_in_ruta);
+            if (es_agrupador_permitido) {
+                ok.setTxt(tr.in(in, "Error, no es un número decimal válido "));
+            } else {
+                ok.setTxt(tr.in(in, "Error, no es un número decimal válido (no use agrupador de dígitos) "));
+            }
+        }
+        return doble;
     }
     /**
      * Valida una url con el formatos k_patrones_email

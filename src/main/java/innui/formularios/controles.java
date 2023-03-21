@@ -154,12 +154,14 @@ public class controles extends bases {
                     ok.iniciar();
                     _presentar(modo_operacion, object, ok, extras_array);
                     if (ok.es == false) { break; }
-                    if (_formulario._es_terminar) {
+                    if (_formulario._es_terminar 
+                     || _formulario._es_cancelar) {
                         break;
                     }
                     object = _capturar(modo_operacion, object, ok, extras_array);
                     if (ok.es == false) { break; }
-                    if (_formulario._es_terminar) {
+                    if (_formulario._es_terminar 
+                     || _formulario._es_cancelar) {
                         break;
                     }
                     _validar(modo_operacion, object, ok, extras_array);
@@ -175,7 +177,8 @@ public class controles extends bases {
                         es_repetir = hacer_repetir_procesar(ok, extras_array);
                         break;
                     }
-                    if (_formulario._es_terminar) {
+                    if (_formulario._es_terminar 
+                     || _formulario._es_cancelar) {
                         break;
                     }
                     valor_de_conversion = _convertir(modo_operacion, object, ok, extras_array);
@@ -193,6 +196,10 @@ public class controles extends bases {
                         ok.iniciar();
                     }
                     es_repetir = hacer_repetir_procesar(ok, extras_array);
+                }
+                if (_formulario._es_terminar 
+                 || _formulario._es_cancelar) {
+                    break;
                 }
                 if (es_repetir == false) {
                     break;

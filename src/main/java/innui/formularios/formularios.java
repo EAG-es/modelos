@@ -158,7 +158,6 @@ public class formularios extends bases {
     public boolean cancelar(oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
-            _es_terminar = true;
             _es_cancelar = true;
         } catch (Exception e) {
             throw e;

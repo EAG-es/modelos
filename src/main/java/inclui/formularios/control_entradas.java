@@ -12,6 +12,9 @@ import static innui.modelos.errores.patrones.k_patrones_formato_hora;
 import innui.modelos.internacionalizacion.tr;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -264,7 +267,11 @@ public class control_entradas extends controles {
         try {
             if (ok.es == false) { return false; }
             int num;
-            num = Integer.parseInt(objeto_a_validar.toString());
+            try {
+                num = Integer.parseInt(objeto_a_validar.toString());
+            } catch (Exception e) {
+                num = 0;
+            }
             if (num >= 1 && num <= 12) {
                 ok.es = true;
             } else {
@@ -279,16 +286,10 @@ public class control_entradas extends controles {
     }
     
     public boolean _validar_numero(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
-        if (ok.es == false) { return false; }
-        ResourceBundle in;
-        Double doble;
-        try {
-            doble = Double.valueOf(objeto_a_validar.toString());
-        } catch (Exception e) {
-            in = ResourceBundles.getBundle(k_in_ruta);
-            ok.setTxt(tr.in(in, "El valor no se corresponde con un número (con o sin decimales). "));
+        if (objeto_a_validar == null) {
+            return false;
         }
-        return ok.es;
+        return patrones.validar_decimal(objeto_a_validar.toString(), false, ok, extras_array);
     }
     
     public boolean _validar_rango(Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
@@ -299,20 +300,23 @@ public class control_entradas extends controles {
             String max = (String) opciones_mapa.get(k_opciones_mapa_max);
             Double min_double;
             Double max_double;
-            Double valor;
-            valor = Double.valueOf(objeto_a_validar.toString());
+            Double valor_doble;
+            valor_doble = patrones.convertir_decimal(objeto_a_validar.toString(), false, ok, extras_array);
+            if (ok.es == false) { return false; }
             if (max != null) {
-                max_double = Double.valueOf(max);
+                max_double = patrones.convertir_decimal(max, false, ok, extras_array);
+                if (ok.es == false) { return false; }
             } else {
                 max_double = 100.0;
             }
             if (min != null) {
-                min_double = Double.valueOf(min);
+                min_double = patrones.convertir_decimal(min, false, ok, extras_array);
+                if (ok.es == false) { return false; }
             } else {
                 min_double = 0.0;
             }
-            if (min_double.compareTo(valor) < 0 
-             || max_double.compareTo(valor) > 0) {
+            if (min_double.compareTo(valor_doble) < 0 
+             || max_double.compareTo(valor_doble) > 0) {
                 in = ResourceBundles.getBundle(k_in_ruta);
                 ok.setTxt(tr.in(in, "El valor está fuera del rango ") + "(" + min_double + ", " + max_double + ")");
             }
@@ -331,7 +335,11 @@ public class control_entradas extends controles {
         try {
             if (ok.es == false) { return false; }
             int num;
-            num = Integer.parseInt(objeto_a_validar.toString());
+            try {
+                num = Integer.parseInt(objeto_a_validar.toString());
+            } catch (Exception e) {
+                num = 0;
+            }
             if (num >= 1 && num <= 52) {
                 ok.es = true;
             } else {
@@ -393,12 +401,11 @@ public class control_entradas extends controles {
                     if (objeto_a_convertir == null) {
                         return null;
                     }
-                    BigDecimal bigDecimal = null;
+                    Double doble = null;
                     if (_ser_valor_vacio(objeto_a_convertir, ok, extras_array) == false) {
-                        Double doble = Double.valueOf(objeto_a_convertir.toString());
-                        bigDecimal = new BigDecimal(doble);
+                        doble = patrones.convertir_decimal(objeto_a_convertir.toString(), false, ok, extras_array);
                     }
-                    return bigDecimal;
+                    return doble;
                 } else if (_control_tipo.equals(k_entradas_tipo_fecha)) {
                     if (objeto_a_convertir == null) {
                         return null;
@@ -597,7 +604,27 @@ public class control_entradas extends controles {
                     if (objeto_a_presentar == null) { 
                         texto = "";
                     } else {
-                        texto = objeto_a_presentar.toString();
+                        if (_control_tipo.equals(k_entradas_tipo_numero)) {
+                            Double doble;
+                            if (objeto_a_presentar instanceof BigDecimal) {
+                                doble = ((BigDecimal) objeto_a_presentar).doubleValue();
+                            } else if (objeto_a_presentar instanceof BigInteger) {
+                                doble = ((BigInteger) objeto_a_presentar).doubleValue();
+                            } else {
+                                doble = (Double) objeto_a_presentar;
+                            }
+                            if (doble == (double) doble.longValue()) {
+                                NumberFormat decimalFormat = NumberFormat.getInstance();
+                                decimalFormat.setGroupingUsed(false);
+                                texto = decimalFormat.format(doble);
+                            } else {
+                                NumberFormat decimalFormat = DecimalFormat.getInstance();
+                                decimalFormat.setGroupingUsed(false);
+                                texto = decimalFormat.format(doble);
+                            }
+                        } else {
+                            texto = objeto_a_presentar.toString();
+                        }
                     }
                     _formulario.escribir(k_entradas_codigo_cancelar
                             + " " + k_entradas_codigo_borrar

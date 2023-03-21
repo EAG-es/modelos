@@ -116,7 +116,11 @@ public class modelos extends iniciales {
             if (ok.es == false) { return ok.es; }
             iniciar(ok);
             if (ok.es) {
-                terminar(ok);
+                oks ok_fin = new oks();
+                terminar(ok_fin);
+                if (ok_fin.es == false) {
+                    ok.setTxt(ok.getTxt(), ok_fin.getTxt());
+                }
             }
             return ok.es;
         } catch (Exception e) {
