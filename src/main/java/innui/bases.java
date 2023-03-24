@@ -52,6 +52,18 @@ public class bases implements i_formatos, i_escrituras {
      * Límite del nivel de log por defeto
      */
     public System.Logger.Level _logger_limite = System.Logger.Level.ALL;
+    
+    public boolean iniciar_base(bases base) {
+        o = base.o;
+        mapa = base.mapa;
+        formato = base.formato;
+        escritura = base.escritura;
+        _dateFormat = base._dateFormat;
+        _numberFormat = base._numberFormat;
+        _logger = base._logger;
+        _logger_limite = base._logger_limite;
+        return true;
+    }
     /**
      * Devuelve un objeto de la clase base, el indicado por el atributo base (si no es null), o el propio.
      * @return un objeto base

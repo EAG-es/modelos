@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package innui.modelos.errores;
 
 import innui.bases;
@@ -55,6 +51,7 @@ public class oks extends bases {
     }
     /**
      * Pone a valor por defecto los atributos no estáticos
+     * @param ok
      * @return true si tiene éxito;
      * @throws Exception 
      */
@@ -63,6 +60,7 @@ public class oks extends bases {
             if (o_es()) {
                 return ((oks)o()).iniciar();
             } else {
+                iniciar_base(ok);
                 es = ok.es;
                 id = ok.id;
                 txt = ok.txt;

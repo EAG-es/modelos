@@ -14,9 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
 /**

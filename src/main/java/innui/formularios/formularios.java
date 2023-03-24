@@ -195,7 +195,7 @@ public class formularios extends bases {
                 _iniciar_formulario(modo_operacion, ok, extras_array);
                 if (ok.es == false) { return false; }
                 for (controles control: _controles_lista) {
-                    if (_es_terminar) {
+                    if (_es_terminar || _es_cancelar) {
                         break;
                     }
                     object = control.procesar(modo_operacion, control.getValor(), ok, extras_array);

@@ -20,6 +20,7 @@ public class controles extends bases {
     public String clave = null;
     public String mensaje_de_captura = null;
     public Map<String, Object> opciones_mapa = null;
+    public Boolean es_hacer_repetir_procesar = false;
 
     /**
      * Valida que el objeto obtenido en el control es válido
@@ -144,10 +145,9 @@ public class controles extends bases {
         Object object = null;
         try {
             if (ok.es == false) { return null; }
-            boolean es_repetir = false;
             while (true) {
                 ok.iniciar();
-                es_repetir = false;
+                es_hacer_repetir_procesar = false;
                 object = _iniciar(modo_operacion, ok, extras_array);
                 if (ok.es == false) { return null; }
                 while (true) {
@@ -164,19 +164,10 @@ public class controles extends bases {
                      || _formulario._es_cancelar) {
                         break;
                     }
-                    _validar(modo_operacion, object, ok, extras_array);
-                    if (ok.es == false) { 
-                        oks ok_1 = new oks();
-                        escribir_linea_error(ok.getTxt(), ok_1);
-                        if (ok_1.es == false) { 
-                            ok.setTxt(ok.getTxt(), ok_1.getTxt());
-                            break; 
-                        } else {
-                            ok.iniciar();
-                        }
-                        es_repetir = hacer_repetir_procesar(ok, extras_array);
-                        break;
+                    if (_validar(modo_operacion, object, ok, extras_array) == false) {
+                        es_hacer_repetir_procesar = poner_hacer_repetir_procesar(ok);
                     }
+                    if (ok.es == false) { break; }
                     if (_formulario._es_terminar 
                      || _formulario._es_cancelar) {
                         break;
@@ -195,13 +186,13 @@ public class controles extends bases {
                     } else {
                         ok.iniciar();
                     }
-                    es_repetir = hacer_repetir_procesar(ok, extras_array);
+                    es_hacer_repetir_procesar = hacer_repetir_procesar(ok, extras_array);
                 }
                 if (_formulario._es_terminar 
                  || _formulario._es_cancelar) {
                     break;
                 }
-                if (es_repetir == false) {
+                if (es_hacer_repetir_procesar == false) {
                     break;
                 }
             }
@@ -211,13 +202,24 @@ public class controles extends bases {
         return object;
     }
     /**
-     * Activa la repetición del procesamiento del control.
+     * Lee si hay que hacer repetición del procesamiento del control.
      * @param ok
      * @param extras_array
      * @return 
+     * @throws java.lang.Exception 
      */
     public boolean hacer_repetir_procesar(oks ok, Object ... extras_array) throws Exception {
-        return true;
+        return es_hacer_repetir_procesar;
+    }
+    /**
+     * Activa la repetición del procesamiento del control.
+     * @param ok Parámetro para la activación
+     * @param extras_array
+     * @return El nuevo valor que debe ponerse.
+     * @throws java.lang.Exception
+     */
+    public boolean poner_hacer_repetir_procesar(oks ok, Object ... extras_array) throws Exception {
+        return (ok.es == false);
     }
     /**
      * Termina los procesos que iniciar dejó abiertos

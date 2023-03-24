@@ -582,6 +582,8 @@ public class control_entradas extends controles {
                     return _presentar_fecha_y_hora(modo_operacion, objeto_a_presentar, ok, extras_array);
                 } else if (_control_tipo.equals(k_entradas_tipo_hora)) {
                     return _presentar_hora(modo_operacion, objeto_a_presentar, ok, extras_array);
+                } else if (_control_tipo.equals(k_entradas_tipo_numero)) {
+                    return _presentar_numero(modo_operacion, objeto_a_presentar, ok, extras_array);
                 } else if (_control_tipo.equals(k_entradas_tipo_color)) {
                     return _presentar_color(modo_operacion, objeto_a_presentar, ok, extras_array);
                 } else if (_control_tipo.equals(k_entradas_tipo_submit)
@@ -604,27 +606,7 @@ public class control_entradas extends controles {
                     if (objeto_a_presentar == null) { 
                         texto = "";
                     } else {
-                        if (_control_tipo.equals(k_entradas_tipo_numero)) {
-                            Double doble;
-                            if (objeto_a_presentar instanceof BigDecimal) {
-                                doble = ((BigDecimal) objeto_a_presentar).doubleValue();
-                            } else if (objeto_a_presentar instanceof BigInteger) {
-                                doble = ((BigInteger) objeto_a_presentar).doubleValue();
-                            } else {
-                                doble = (Double) objeto_a_presentar;
-                            }
-                            if (doble == (double) doble.longValue()) {
-                                NumberFormat decimalFormat = NumberFormat.getInstance();
-                                decimalFormat.setGroupingUsed(false);
-                                texto = decimalFormat.format(doble);
-                            } else {
-                                NumberFormat decimalFormat = DecimalFormat.getInstance();
-                                decimalFormat.setGroupingUsed(false);
-                                texto = decimalFormat.format(doble);
-                            }
-                        } else {
-                            texto = objeto_a_presentar.toString();
-                        }
+                        texto = objeto_a_presentar.toString();
                     }
                     _formulario.escribir(k_entradas_codigo_cancelar
                             + " " + k_entradas_codigo_borrar
@@ -820,6 +802,59 @@ public class control_entradas extends controles {
                 _formulario.escribir(k_entradas_codigo_cancelar
                         + " " + k_entradas_codigo_borrar
                         + " <(" + k_patrones_formato_fecha + ") (" + k_patrones_formato_hora + ")>"
+                        + " [" + texto + "] > "
+                        , ok);
+            }            
+        } catch (Exception e) {
+            throw e;
+        }
+        return ok.es;
+    }
+    /**
+     * Presenta información antes de capturar una fecha
+     * @param modo_operacion
+     * @param objeto_a_presentar
+     * @param ok
+     * @param extras_array
+     * @return true si todo es correcto
+     * @throws Exception 
+     */
+    public boolean _presentar_numero(String modo_operacion, Object objeto_a_presentar, oks ok, Object ... extras_array) throws Exception {
+        try {
+            if (ok.es == false) { return false; }
+            if (modo_operacion.equals(k_fase_procesamiento)) {
+                super._presentar(modo_operacion, objeto_a_presentar, ok, extras_array);
+                if (ok.es == false) { return false; }
+                if (_utilizar_valor_por_defecto(objeto_a_presentar, ok, extras_array)) {
+                    objeto_a_presentar = valor;
+                }
+                if (ok.es == false) { return false; }
+                String texto;
+                if (objeto_a_presentar == null) { 
+                    texto = "";
+                } else if (objeto_a_presentar instanceof String) { 
+                    texto = (String) objeto_a_presentar;
+                } else {
+                    Double doble;
+                    if (objeto_a_presentar instanceof BigDecimal) {
+                        doble = ((BigDecimal) objeto_a_presentar).doubleValue();
+                    } else if (objeto_a_presentar instanceof BigInteger) {
+                        doble = ((BigInteger) objeto_a_presentar).doubleValue();
+                    } else {
+                        doble = (Double) objeto_a_presentar;
+                    }
+                    if (doble == (double) doble.longValue()) {
+                        NumberFormat decimalFormat = NumberFormat.getInstance();
+                        decimalFormat.setGroupingUsed(false);
+                        texto = decimalFormat.format(doble);
+                    } else {
+                        NumberFormat decimalFormat = DecimalFormat.getInstance();
+                        decimalFormat.setGroupingUsed(false);
+                        texto = decimalFormat.format(doble);
+                    }
+                }
+                _formulario.escribir(k_entradas_codigo_cancelar
+                        + " " + k_entradas_codigo_borrar
                         + " [" + texto + "] > "
                         , ok);
             }            

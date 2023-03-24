@@ -20,10 +20,9 @@ public class control_tablas extends control_entradas {
     public static String k_control_tablas_opciones_mapas_lista = "control_tablas_opciones_mapas_lista";
     public static String k_control_tablas_letras_por_linea_num = "control_tablas_letras_por_linea_num";
     public static String k_separador_columna = "|";
-    public static String k_indicador_mas_columnas = "+";
+    public static String k_indicador_mas_datos = "+";
     public LinkedList<LinkedHashMap<String, Object>> control_filas_lista;
     public Integer _letras_por_linea = 0;
-    public Boolean es_error_en_terminar = false;
     
     public control_tablas() {
         _control_tipo = k_entradas_tipo_numero;
@@ -108,7 +107,7 @@ public class control_tablas extends control_entradas {
             es_exceso_tam = false;
             while (true) {
                 tam = k_separador_columna.length() + k_separador_columna.length()
-                 + k_indicador_mas_columnas.length();
+                 + k_indicador_mas_datos.length();
                 for (int columna_tam: letras_columna_lista) {
                     tam = tam + columna_tam + k_separador_columna.length();
                 }
@@ -125,7 +124,7 @@ public class control_tablas extends control_entradas {
                 formato_tex = formato_tex + k_separador_columna + "%-" + columna_tam + "s";
             }
             if (es_exceso_tam) {
-                formato_tex = formato_tex + k_separador_columna + k_indicador_mas_columnas;
+                formato_tex = formato_tex + k_separador_columna + k_indicador_mas_datos;
             } else {
                 formato_tex = formato_tex + k_separador_columna;
             }
@@ -176,7 +175,7 @@ public class control_tablas extends control_entradas {
                         if (valor_objeto != null) {
                             texto = valor_objeto.toString();
                             if (texto.length() > letras_columna_lista.get(i_columna)) {
-                                texto = texto.substring(0, letras_columna_lista.get(i_columna)-1) + k_indicador_mas_columnas;
+                                texto = texto.substring(0, letras_columna_lista.get(i_columna)-1) + k_indicador_mas_datos;
                             }
                         } else {
                             texto = "";
@@ -209,6 +208,17 @@ public class control_tablas extends control_entradas {
     public boolean _validar(String modo_operacion, Object objeto_a_validar, oks ok, Object ... extras_array) throws Exception {
         return ok.es;
     }    
+    /**
+     * Activa la repetición del procesamiento del control.
+     * @param ok Parámetro para la activación
+     * @param extras_array
+     * @return El nuevo valor que debe ponerse.
+     * @throws Exception 
+     */
+    @Override
+    public boolean poner_hacer_repetir_procesar(oks ok, Object ... extras_array) throws Exception {
+        return false;
+    }
     /**
      * Procesa la información capturada
      * @param modo_operacion
@@ -320,30 +330,6 @@ public class control_tablas extends control_entradas {
             throw e;
         }
         return retorno_mapa;
-    }
-    /**
-     * Termina los procesos que iniciar dejó abiertos
-     * @param modo_operacion
-     * @param objeto_a_terminar
-     * @param ok
-     * @param extras_array
-     * @return Un objeto resultante, o null si hay error.
-     * @throws Exception 
-     */
-    public Object _terminar(String modo_operacion, Object objeto_a_terminar, oks ok, Object ... extras_array) throws Exception {
-        es_error_en_terminar = ok.es;
-        return objeto_a_terminar;
-    }
-    /**
-     * Activa la repetición del procesamiento del control.
-     * @param ok
-     * @param extras_array
-     * @return 
-     * @throws java.lang.Exception 
-     */
-    @Override
-    public boolean hacer_repetir_procesar(oks ok, Object ... extras_array) throws Exception {
-        return es_error_en_terminar;
     }
     
 }
