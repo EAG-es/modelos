@@ -382,8 +382,6 @@ public class sql_comandos {
         if (ok.es == false) { return null; }
         String texto = null;
         try {
-            NumberFormat numberFormat = NumberFormat.getInstance();
-            NumberFormat decimalFormat = DecimalFormat.getInstance();
             if (valor == null) {
                 texto = "null";
             } else if (valor instanceof String) {
@@ -393,17 +391,17 @@ public class sql_comandos {
             } else if (valor instanceof Time valor_time) {
                 texto = "'" + String.format(k_sql_comandos_formato_time, valor_time) + "'";
             } else if (valor instanceof Integer valor_integer) {
-                texto = numberFormat.format(valor_integer);
+                texto = String.valueOf(valor_integer);
             } else if (valor instanceof Long valor_long) {
-                texto = numberFormat.format(valor_long);
+                texto = String.valueOf(valor_long);
             } else if (valor instanceof Double valor_double) {
-                texto = decimalFormat.format(valor_double);
+                texto = String.valueOf(valor_double);
             } else if (valor instanceof Float valor_float) {
-                texto = decimalFormat.format(valor_float);
+                texto = String.valueOf(valor_float);
             } else if (valor instanceof BigDecimal valor_bigdecimal) {
-                texto = decimalFormat.format(valor_bigdecimal);
+                texto = valor_bigdecimal.toPlainString();
             } else if (valor instanceof BigInteger valor_biginteger) {
-                texto = numberFormat.format(valor_biginteger);
+                texto = valor_biginteger.toString();
             } else {
                 texto = valor.toString();
             }

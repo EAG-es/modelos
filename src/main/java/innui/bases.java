@@ -53,6 +53,17 @@ public class bases implements i_formatos, i_escrituras {
      */
     public System.Logger.Level _logger_limite = System.Logger.Level.ALL;
     
+    public boolean iniciar_base() {
+        o = null;
+        mapa = null;
+        formato = null;
+        escritura = null;
+        _dateFormat = null;
+        _numberFormat = null;
+        _logger = null;
+        _logger_limite = null;
+        return true;
+    }
     public boolean iniciar_base(bases base) {
         o = base.o;
         mapa = base.mapa;

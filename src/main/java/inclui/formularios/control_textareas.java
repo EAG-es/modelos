@@ -9,8 +9,8 @@ import innui.modelos.errores.oks;
  */
 public class control_textareas extends control_entradas {
     public static String k_in_ruta = "in/inclui/formularios/in";
-    public static String k_textareas_codigo_fin = "./.";
-    public static String k_textareas_codigo_igual = ".=.";
+    public static String k_control_textareas_codigo_fin = "./.";
+    public static String k_control_textareas_codigo_igual = ".=.";
     
     public control_textareas() {
         _control_tipo = k_entradas_tipo_texto;
@@ -56,8 +56,8 @@ public class control_textareas extends control_entradas {
                 }
                 _formulario.escribir(k_entradas_codigo_cancelar
                         + " " + k_entradas_codigo_borrar
-                        + " " + k_textareas_codigo_fin
-                        + " " + k_textareas_codigo_igual
+                        + " " + k_control_textareas_codigo_fin
+                        + " " + k_control_textareas_codigo_igual
                         + " [" + texto + "] > "
                         , ok);
             }            
@@ -84,7 +84,7 @@ public class control_textareas extends control_entradas {
             if (modo_operacion.equals(k_fase_procesamiento)) {
                 while (true) {
                     linea = _clui_lectura.leer_linea(ok, extras_array);
-                    if (linea.equals(k_textareas_codigo_fin)) {
+                    if (linea.equals(k_control_textareas_codigo_fin)) {
                         break;
                     }
                     if (linea.equals(k_entradas_codigo_cancelar)) {
@@ -96,7 +96,7 @@ public class control_textareas extends control_entradas {
                         break;
                     }
                     if (texto.isEmpty()) {
-                        if (linea.equals(k_textareas_codigo_igual)) {
+                        if (linea.equals(k_control_textareas_codigo_igual)) {
                             break;
                         }
                         texto = linea;

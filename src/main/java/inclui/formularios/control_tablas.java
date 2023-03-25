@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
  */
 public class control_tablas extends control_entradas {
     public static String k_in_ruta = "in/inclui/formularios/in";
-    public static String k_control_tablas_opciones_mapas_lista = "control_tablas_opciones_mapas_lista";
+    public static String k_control_tablas_opciones_mapa_lista = "control_tablas_opciones_mapas_lista";
     public static String k_control_tablas_letras_por_linea_num = "control_tablas_letras_por_linea_num";
     public static String k_separador_columna = "|";
     public static String k_indicador_mas_datos = "+";
@@ -254,10 +254,10 @@ public class control_tablas extends control_entradas {
             if (ok.es == false) { return false; }
             if (opciones_mapa != null) {
                 if (control_filas_lista == null) {
-                    control_filas_lista = (LinkedList<LinkedHashMap<String, Object>>) opciones_mapa.get(k_control_tablas_opciones_mapas_lista);
+                    control_filas_lista = (LinkedList<LinkedHashMap<String, Object>>) opciones_mapa.get(k_control_tablas_opciones_mapa_lista);
                     if (control_filas_lista == null) {
                         in = ResourceBundles.getBundle(k_in_ruta);
-                        ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_control_tablas_opciones_mapas_lista);
+                        ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_control_tablas_opciones_mapa_lista);
                     }
                 }
                 _letras_por_linea = (Integer) opciones_mapa.get(k_control_tablas_letras_por_linea_num);
@@ -268,7 +268,7 @@ public class control_tablas extends control_entradas {
             } else {
                 in = ResourceBundles.getBundle(k_in_ruta);
                 if (control_filas_lista == null) {
-                    ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_control_tablas_opciones_mapas_lista);
+                    ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_control_tablas_opciones_mapa_lista);
                 }
                 ok.setTxt(ok.getTxt(), tr.in(in, "Falta la entrada del mapa: ") + k_control_tablas_letras_por_linea_num);
             }
@@ -300,7 +300,7 @@ public class control_tablas extends control_entradas {
         try {
             control_filas_lista = filas_lista;
             if (opciones_mapa != null) {
-                opciones_mapa.put(k_control_tablas_opciones_mapas_lista, control_filas_lista);
+                opciones_mapa.put(k_control_tablas_opciones_mapa_lista, control_filas_lista);
             }
         } catch (Exception e) {
             throw e;

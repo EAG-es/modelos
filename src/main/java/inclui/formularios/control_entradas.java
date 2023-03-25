@@ -403,7 +403,7 @@ public class control_entradas extends controles {
                     }
                     Double doble = null;
                     if (_ser_valor_vacio(objeto_a_convertir, ok, extras_array) == false) {
-                        doble = patrones.convertir_decimal(objeto_a_convertir.toString(), false, ok, extras_array);
+                        doble = _convertir_numero(objeto_a_convertir, ok, extras_array);
                     }
                     return doble;
                 } else if (_control_tipo.equals(k_entradas_tipo_fecha)) {
@@ -464,6 +464,17 @@ public class control_entradas extends controles {
             ok.setTxt(tr.in(in, "Error al convertir el valor digitalmente. "), extras_array);
         }
         return ok.es;
+    }
+    /**
+     * Convertir un número decimal con o sin decimales
+     * @param objeto_a_convertir
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public Double _convertir_numero(Object objeto_a_convertir, oks ok, Object ... extras_array) throws Exception {
+        return patrones.convertir_decimal(objeto_a_convertir.toString(), false, ok, extras_array);
     }
     /**
      * Procesa la información capturada

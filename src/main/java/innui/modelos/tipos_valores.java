@@ -12,10 +12,26 @@ import java.util.Date;
  * @author emilio
  */
 public class tipos_valores {
-    public static String k_formato_date = "%1$td/%1$tm/%1$ty %1$tT";
-    public static String k_formato_time = "%1$tT";
-    public static String k_formato_numero = "%1$,15d";
-    public static String k_formato_decimal = "%1$,15.2f";
+    public static String k_tipos_valores_formato_date = "%1$td/%1$tm/%1$ty %1$tT";
+    public static String k_tipos_valores_formato_time = "%1$tT";
+    public static String k_tipos_valores_formato_numero_con_agrupador = "%1$,d";
+    public static String k_tipos_valores_formato_decimal_con_agrupador_2_decimales = "%1$,.2f";
+    public static String k_tipos_valores_formato_decimal_con_agrupador_3_decimales = "%1$,.3f";
+    public static String k_tipos_valores_formato_numero_sin_agrupador = "%1$d";
+    public static String k_tipos_valores_formato_decimal_sin_agrupador_2_decimales = "%1$.2f";
+    public static String k_tipos_valores_formato_decimal_sin_agrupador_3_decimales = "%1$.3f";
+    public static String k_tipos_valores_formato_numero_con_agrupador_15 = "%1$,15d";
+    public static String k_tipos_valores_formato_decimal_con_agrupador_15_2_decimales = "%1$,15.2f";
+    public static String k_tipos_valores_formato_decimal_con_agrupador_15_3_decimales = "%1$,15.3f";
+    public static String k_tipos_valores_formato_numero_sin_agrupador_15 = "%1$15d";
+    public static String k_tipos_valores_formato_decimal_sin_agrupador_15_2_decimales = "%1$15.2f";
+    public static String k_tipos_valores_formato_decimal_sin_agrupador_15_3_decimales = "%1$15.3f";
+    public static String k_tipos_valores_formato_numero_con_agrupador_por_defecto = k_tipos_valores_formato_numero_con_agrupador_15;
+    public static String k_tipos_valores_formato_decimal_con_agrupador_por_defecto = k_tipos_valores_formato_decimal_con_agrupador_15_2_decimales;
+    public static String k_tipos_valores_formato_numero_sin_agrupador_por_defecto = k_tipos_valores_formato_numero_sin_agrupador_15;
+    public static String k_tipos_valores_formato_decimal_sin_agrupador_por_defecto = k_tipos_valores_formato_decimal_sin_agrupador_15_2_decimales;
+    public static String k_tipos_valores_modo_con_agrupador = "modo_con_agrupador";
+    public static String k_tipos_valores_modo_sin_agrupador = "modo_sin_agrupador";
     /**
      * El nombre simple (getSimpleName) de una clase.
      */
@@ -65,7 +81,6 @@ public class tipos_valores {
         }
         return texto;
     }
-
     /**
      * Pasa a texto el dato.
      * @param ok
@@ -74,48 +89,68 @@ public class tipos_valores {
      * @throws Exception 
      */
     public String pasar_a_texto_segun_tipo(oks ok, Object... extra_array) throws Exception {
+        return pasar_a_texto_segun_tipo(k_tipos_valores_modo_con_agrupador, ok, extra_array);
+    }
+    /**
+     * Pasa a texto el dato.
+     * @param modo k_tipos_valores_modo_con_agrupador o k_tipos_valores_modo_sin_agrupador
+     * @param ok
+     * @param extra_array
+     * @return
+     * @throws Exception 
+     */
+    public String pasar_a_texto_segun_tipo(String modo, oks ok, Object... extra_array) throws Exception {
         if (ok.es == false) { return null; }
         String retorno = null;
         try {
-            String tipo = getTipo();
-            Object valor = getValor();
+            String tipo_tex = getTipo();
+            Object valor_tex = getValor();
             Date date;
             Time time;
-            if (valor == null) {
-                retorno = "--";
-            } else if (valor instanceof String) {
-                if (tipo.toLowerCase().contains("date")
-                 || tipo.toLowerCase().contains("timestamp")) {
-                    date = _convertir_fecha_y_hora(valor.toString(), ok);
-                    retorno = String.format(k_formato_date, date);
-                } else if (tipo.toLowerCase().contains("time")) {
-                    time = _convertir_hora(valor.toString(), ok);
-                    retorno = String.format(k_formato_time, time);
-                } else {
-                    retorno = valor.toString();
-                }
-            } else if (valor instanceof Date valor_date) {
-                retorno = String.format(k_formato_date, valor_date);
-            } else if (valor instanceof Time valor_time) {
-                retorno = String.format(k_formato_time, valor_time);
-            } else if (valor instanceof Integer valor_integer) {
-                retorno = String.format(k_formato_numero, valor_integer);
-            } else if (valor instanceof Long valor_long) {
-                retorno = String.format(k_formato_numero, valor_long);
-            } else if (valor instanceof Double valor_double) {
-                retorno = String.format(k_formato_decimal, valor_double);
-            } else if (valor instanceof Float valor_float) {
-                retorno = String.format(k_formato_decimal, valor_float);
-            } else if (valor instanceof BigDecimal valor_bigdecimal) {
-                if (valor_bigdecimal.remainder(BigDecimal.ONE).multiply(BigDecimal.valueOf(1000)).compareTo(BigDecimal.ZERO) > 0) {
-                    retorno = String.format(k_formato_decimal, valor_bigdecimal);
-                } else {
-                    retorno = String.format(k_formato_numero, valor_bigdecimal.toBigIntegerExact());
-                }
-            } else if (valor instanceof BigInteger valor_biginteger) {
-                retorno = String.format(k_formato_numero, valor_biginteger);
+            String formato_numero;
+            String formato_decimal;
+            if (modo.equals(k_tipos_valores_modo_con_agrupador)) {
+                formato_numero = k_tipos_valores_formato_numero_con_agrupador_por_defecto;
+                formato_decimal = k_tipos_valores_formato_decimal_con_agrupador_por_defecto;
             } else {
-                retorno = valor.toString();
+                formato_numero = k_tipos_valores_formato_numero_sin_agrupador_por_defecto;
+                formato_decimal = k_tipos_valores_formato_decimal_sin_agrupador_por_defecto;
+            }
+            if (valor_tex == null) {
+                retorno = "--";
+            } else if (valor_tex instanceof String) {
+                if (tipo_tex.toLowerCase().contains("date")
+                 || tipo_tex.toLowerCase().contains("timestamp")) {
+                    date = _convertir_fecha_y_hora(valor_tex.toString(), ok);
+                    retorno = String.format(k_tipos_valores_formato_date, date);
+                } else if (tipo_tex.toLowerCase().contains("time")) {
+                    time = _convertir_hora(valor_tex.toString(), ok);
+                    retorno = String.format(k_tipos_valores_formato_time, time);
+                } else {
+                    retorno = valor_tex.toString();
+                }
+            } else if (valor_tex instanceof Date valor_date) {
+                retorno = String.format(k_tipos_valores_formato_date, valor_date);
+            } else if (valor_tex instanceof Time valor_time) {
+                retorno = String.format(k_tipos_valores_formato_time, valor_time);
+            } else if (valor_tex instanceof Integer valor_integer) {
+                retorno = String.format(formato_numero, valor_integer);
+            } else if (valor_tex instanceof Long valor_long) {
+                retorno = String.format(formato_numero, valor_long);
+            } else if (valor_tex instanceof Double valor_double) {
+                retorno = String.format(formato_decimal, valor_double);
+            } else if (valor_tex instanceof Float valor_float) {
+                retorno = String.format(formato_decimal, valor_float);
+            } else if (valor_tex instanceof BigDecimal valor_bigdecimal) {
+                if (valor_bigdecimal.remainder(BigDecimal.ONE).multiply(BigDecimal.valueOf(1000)).compareTo(BigDecimal.ZERO) > 0) {
+                    retorno = String.format(formato_decimal, valor_bigdecimal);
+                } else {
+                    retorno = String.format(formato_numero, valor_bigdecimal.toBigIntegerExact());
+                }
+            } else if (valor_tex instanceof BigInteger valor_biginteger) {
+                retorno = String.format(formato_numero, valor_biginteger);
+            } else {
+                retorno = valor_tex.toString();
             }
         } catch (Exception e) {
             ok.setTxt(e);

@@ -39,6 +39,7 @@ public class oks extends bases {
             if (o_es()) {
                 return ((oks)o()).iniciar();
             } else {
+                iniciar_base();
                 es = true;
                 id = "";
                 txt = "";
