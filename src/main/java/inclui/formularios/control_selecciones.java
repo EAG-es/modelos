@@ -110,7 +110,10 @@ public class control_selecciones extends control_entradas {
                     if (valor_objeto != null) {
                         texto = valor_objeto.toString();
                         if (texto.length() > tam) {
-                            texto = texto.substring(0, tam-1) + k_indicador_mas_columnas;
+                            texto = texto.trim();
+                            if (texto.length() > tam) {
+                                texto = texto.trim().substring(0, tam-1) + k_indicador_mas_columnas;
+                            }
                         }
                     } else {
                         texto = "";

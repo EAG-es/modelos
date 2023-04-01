@@ -175,7 +175,10 @@ public class control_tablas extends control_entradas {
                         if (valor_objeto != null) {
                             texto = valor_objeto.toString();
                             if (texto.length() > letras_columna_lista.get(i_columna)) {
-                                texto = texto.substring(0, letras_columna_lista.get(i_columna)-1) + k_indicador_mas_datos;
+                                texto = texto.trim();
+                                if (texto.length() > letras_columna_lista.get(i_columna)) {
+                                    texto = texto.substring(0, letras_columna_lista.get(i_columna)-1) + k_indicador_mas_datos;
+                                }
                             }
                         } else {
                             texto = "";
