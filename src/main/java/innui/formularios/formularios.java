@@ -133,7 +133,7 @@ public class formularios extends bases {
         return _es_cancelar;
     }
     /** 
-     * Evita que se continúe con la valor_de_captura del _formulario
+     * Evita que se continúe con el valor_de_captura del _formulario
      * @param ok
      * @param extras_array
      * @return

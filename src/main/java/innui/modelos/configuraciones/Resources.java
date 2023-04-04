@@ -79,6 +79,7 @@ public class Resources extends bases {
                 url = file.toURI().toURL();
             } else {
                 url = clase.getResource(ruta_relativa);
+                ok.es = (url != null);
             }
         } catch (Exception e) {
             in = ResourceBundles.getBundle(k_in_ruta);
