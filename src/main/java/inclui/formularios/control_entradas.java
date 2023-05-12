@@ -546,6 +546,10 @@ public class control_entradas extends controles {
         try {
             if (ok.es == false) { return null; }
             linea = _clui_lectura.leer_linea(ok, extras_array);
+            if (linea.equals(k_entradas_codigo_cancelar)) {
+                _formulario.cancelar(ok, extras_array);
+                return null;
+            }
         } catch (Exception e) {
             throw e;
         }
