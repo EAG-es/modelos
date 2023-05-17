@@ -199,12 +199,10 @@ public class control_selecciones extends control_entradas {
             super.poner_en_formulario(formulario, clave, valor, mensaje_de_captura, opciones_mapa, ok, extras_array);
             if (ok.es == false) { return false; }
             if (opciones_mapa != null) {
+                control_selecciones_mapa = (LinkedHashMap<String, Object>) opciones_mapa.get(k_control_selecciones_opciones_mapa);
                 if (control_selecciones_mapa == null) {
-                    control_selecciones_mapa = (LinkedHashMap<String, Object>) opciones_mapa.get(k_control_selecciones_opciones_mapa);
-                    if (control_selecciones_mapa == null) {
-                        in = ResourceBundles.getBundle(k_in_ruta);
-                        ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_control_selecciones_opciones_mapa);
-                    }
+                    in = ResourceBundles.getBundle(k_in_ruta);
+                    ok.setTxt(tr.in(in, "Falta la entrada del mapa: ") + k_control_selecciones_opciones_mapa);
                 }
                 _letras_por_linea = (Integer) opciones_mapa.get(k_control_selecciones_letras_por_linea_num);
                 if (_letras_por_linea == null) {
