@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package innui.modelos.configuraciones;
 
 import innui.bases;
@@ -148,6 +143,7 @@ public class Resources extends bases {
                 inputstream = file.toURI().toURL().openStream();
             } else {
                 inputstream = clase.getResourceAsStream(ruta_relativa);
+                ok.es = (inputstream != null);
             }
         } catch (Exception e) {
             ok.txt = e.getMessage();

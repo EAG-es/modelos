@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package innui.modelos.configuraciones;
 
 import innui.bases;
@@ -108,8 +103,8 @@ public class ResourceBundles extends bases {
                 } else {
                     resourceBundle = ResourceBundle.getBundle(ruta_base, locale);
                 }
-                ok.no_nul(resourceBundle);
             }
+            ok.no_nul(resourceBundle);
         } catch (Exception e) {
             throw e;
         }
@@ -149,6 +144,7 @@ public class ResourceBundles extends bases {
                     resourceBundle = ResourceBundle.getBundle(ruta_base, locale, loader);
                 }
             }
+            ok.no_nul(resourceBundle);
         } catch (Exception e) {
             throw e;
         }
@@ -190,6 +186,7 @@ public class ResourceBundles extends bases {
                     }
                 }
             }
+            ok.no_nul(resourceBundle);
         } catch (Exception e) {
             throw e;
         }
@@ -238,6 +235,7 @@ public class ResourceBundles extends bases {
                     }
                 }
             }
+            ok.no_nul(resourceBundle);
         } catch (Exception e) {
             throw e;
         }
@@ -286,8 +284,8 @@ public class ResourceBundles extends bases {
                 } else {
                     resourceBundle = ResourceBundle.getBundle(ruta_base, control);
                 }
-                System.out.println("resourceBundle == null = " + (resourceBundle == null ));
             }
+            ok.no_nul(resourceBundle);
         } catch (Exception e) {
             throw e;
         }
@@ -327,6 +325,7 @@ public class ResourceBundles extends bases {
                     }
                 }
             }
+            ok.no_nul(resourceBundle);
         } catch (Exception e) {
             throw e;
         }
@@ -367,6 +366,7 @@ public class ResourceBundles extends bases {
                     }
                 }
             }
+            ok.no_nul(resourceBundle);
         } catch (Exception e) {
             throw e;
         }

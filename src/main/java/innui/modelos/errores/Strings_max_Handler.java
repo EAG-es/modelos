@@ -20,7 +20,7 @@ import java.util.logging.LogRecord;
 public class Strings_max_Handler extends Handler {
 
     public static String k_in_ruta = "in/innui/modelos/errores/in";
-    public LinkedList<String> linkedList;
+    public final LinkedList<String> linkedList;
     public Formatter formatter;
     public int max_tam = 0;
     public java.util.logging.Level pushLevel;
