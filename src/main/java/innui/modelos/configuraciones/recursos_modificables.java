@@ -228,7 +228,6 @@ public class recursos_modificables extends bases {
             ruta = leer_ruta_jar_desde_clase(clase, ok);
             ok.no_nul(ruta);
             if (ok.es == false) { return false; }
-            ok.iniciar();
             zip = new ZipInputStream(new FileInputStream(ruta));
             while (true) {
                 zipentry = zip.getNextEntry();
