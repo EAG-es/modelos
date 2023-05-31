@@ -145,6 +145,7 @@ public class controles extends bases {
         Object object = null;
         try {
             if (ok.es == false) { return null; }
+            oks ok_1 = new oks();
             while (true) {
                 ok.iniciar();
                 es_hacer_repetir_procesar = false;
@@ -176,9 +177,11 @@ public class controles extends bases {
                     if (ok.es == false) { break; }
                     break;
                 }
-                object = _terminar(modo_operacion, object, ok, extras_array);
-                if (ok.es == false) { 
-                    oks ok_1 = new oks();
+                ok_1.iniciar();
+                object = _terminar(modo_operacion, object, ok_1, extras_array);
+                if (ok_1.es == false) { break; }
+                if (ok.es == false) {
+                    ok_1.iniciar();
                     escribir_linea_error(ok.getTxt(), ok_1);
                     if (ok_1.es == false) { 
                         ok.setTxt(ok.getTxt(), ok_1.getTxt());
