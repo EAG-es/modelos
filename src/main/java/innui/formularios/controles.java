@@ -189,8 +189,8 @@ public class controles extends bases {
                     } else {
                         ok.iniciar();
                     }
-                    es_hacer_repetir_procesar = hacer_repetir_procesar(ok, extras_array);
                 }
+                es_hacer_repetir_procesar = hacer_repetir_procesar(ok, extras_array);
                 if (_formulario._es_terminar 
                  || _formulario._es_cancelar) {
                     break;
