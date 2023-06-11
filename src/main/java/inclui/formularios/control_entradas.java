@@ -41,7 +41,7 @@ public class control_entradas extends controles {
     public static String k_entradas_tipo_hora = "time";
     public static String k_entradas_tipo_url = "url";
     public static String k_entradas_tipo_semana = "week";    
-    public static String k_entradas_tipo_ruta_archivo = "file";
+    public static String k_entradas_tipo_archivo = "file";
     public static String k_entradas_tipo_password = "password";
     public static String k_entradas_tipo_hidden = "hidden";
     public static String k_entradas_tipo_submit = "submit";
@@ -162,7 +162,7 @@ public class control_entradas extends controles {
                     } 
                     return ok.es;
                 }
-                if (_control_tipo.equals(k_entradas_tipo_ruta_archivo)) {
+                if (_control_tipo.equals(k_entradas_tipo_archivo)) {
                     return _validar_ruta_archivo(objeto_a_validar, ok, extras_array);
                 } else if (_control_tipo.equals(k_entradas_tipo_texto)
                         || _control_tipo.equals(k_entradas_tipo_search)) {
@@ -389,7 +389,7 @@ public class control_entradas extends controles {
                         }
                     }
                 }
-                if (_control_tipo.equals(k_entradas_tipo_ruta_archivo)) {
+                if (_control_tipo.equals(k_entradas_tipo_archivo)) {
                     if (objeto_a_convertir == null) {
                         return null;
                     }
