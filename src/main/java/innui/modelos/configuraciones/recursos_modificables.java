@@ -118,13 +118,14 @@ public class recursos_modificables extends bases {
     /**
      * Copia un recurso fuera de un archivo jar (si no existe), manteniendo la misma estructura de carpetas.
      * @param clase Clase de referencia relativa
+     * @param es_reinstalacion Se ignora la instalación previa
      * @param ruta_recurso Ruta relativa del recurso
      * @param ok Comunicar resultados
      * @param extra_array Opción de añadir parámetros en el futuro.
      * @return true si todo va bien
      * @throws Exception Opción de notificar errores de excepción
      */
-    public static boolean instalar_fuera(Class<?> clase, String ruta_recurso, oks ok, Object ... extra_array) throws Exception {
+    public static boolean instalar_fuera(boolean es_reinstalacion, Class<?> clase, String ruta_recurso, oks ok, Object ... extra_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
             String ruta_absoluta_destino;
@@ -133,7 +134,7 @@ public class recursos_modificables extends bases {
             ok.no_nul(ruta_absoluta_destino);
             if (ok.es == false) { return false; }
             file = new File(ruta_absoluta_destino);
-            if (file.exists() == false) {
+            if (es_reinstalacion || file.exists() == false) {
                 crear_rutas_padre(file, ok);
                 if (ok.es == false) { return false; }
                 copiar_recurso(clase, ruta_recurso, ruta_absoluta_destino, ok);
@@ -174,6 +175,7 @@ public class recursos_modificables extends bases {
     }
     /**
      * Copia una carpeta fuera de un archivo jar (si no existe ya), manteniendo la misma estructura de carpetas.
+     * @param es_reinstalacion Se ignora la instalación previa
      * @param clase Clase de referencia relativa
      * @param ruta_origen_recurso Ruta relativa del recurso
      * @param ok Comunicar resultados
@@ -181,7 +183,7 @@ public class recursos_modificables extends bases {
      * @return true si todo va bien
      * @throws Exception Opción de notificar errores de excepción
      */
-    public static boolean instalar_carpeta_fuera(Class<?> clase, String ruta_origen_recurso, oks ok, Object ... extra_array) throws Exception {
+    public static boolean instalar_carpeta_fuera(boolean es_reinstalacion, Class<?> clase, String ruta_origen_recurso, oks ok, Object ... extra_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
             List<String> contenido_lista = new ArrayList<>();
@@ -192,7 +194,7 @@ public class recursos_modificables extends bases {
                 }
                 for (String ruta: contenido_lista) {
                     if (ruta.startsWith(ruta_origen_recurso)) {
-                        ok.es = instalar_fuera(clase, ruta, ok);
+                        ok.es = instalar_fuera(es_reinstalacion, clase, ruta, ok);
                         if (ok.es == false) {
                             break;
                         }

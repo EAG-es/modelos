@@ -23,6 +23,7 @@ public abstract class iniciales extends bases {
     public static String k_ruta_relativa_properties = "/re/configuraciones" + k_extension_properties;  //NOI18N
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";  //NOI18N
     public static String k_propiedad_duplicada = "propiedad_duplicada";
+    public static String k_iniciales_reinstalacion_num = "iniciales.reinstalacion";
     public Properties properties = null;
     
     /**
@@ -37,8 +38,27 @@ public abstract class iniciales extends bases {
      * @throws Exception Opción de notificar errores de excepción
      */
     public boolean _iniciar_desde_clase(Class<?> mainclass, oks ok, Object ... extras_array) throws Exception {
+        return _iniciar_desde_clase(false, mainclass, ok, extras_array);
+    }
+    /**
+     * _iniciar_desde_clase con opción de reinstalacion
+     * @param es_reinstalacion
+     * @param mainclass
+     * @param ok
+     * @param extras_array
+     * @return
+     * @throws Exception 
+     */
+    public boolean _iniciar_desde_clase(boolean es_reinstalacion, Class<?> mainclass, oks ok, Object ... extras_array) throws Exception {
         try {
             if (ok.es == false) { return false; }
+            String ruta_properties;
+            File file;
+            String reinstalacion_tex;
+            InputStream inputStream;
+            int reinstalacion_num = -1;
+            int reinstalacion_previa_num = -1;
+            boolean es_reinstalacion_realizada = false;
             ResourceBundle in;
             in = ResourceBundles.getBundle(k_in_ruta);
             _logger = Loggers.getLogger(null);
@@ -46,23 +66,41 @@ public abstract class iniciales extends bases {
             bases.k_logger_nombre.append(_logger.getName());
             ok.no_nul(_logger, tr.in(in, "Logger nulo. "));
             if (ok.es == false) { return false; }
-            recursos_modificables.instalar_carpeta_fuera(mainclass
+            // Cargar un archivo properties
+            if (es_reinstalacion == false) {
+                ruta_properties = mainclass.getPackageName();
+                file = new File(k_ruta_relativa_recursos, ruta_properties + k_extension_properties);
+                ruta_properties = file.getCanonicalPath();
+                inputStream = mainclass.getResourceAsStream(ruta_properties);
+                if (inputStream == null) {
+                    ruta_properties = k_ruta_relativa_properties;
+                    inputStream = mainclass.getResourceAsStream(ruta_properties);
+                }
+                if (inputStream != null) {
+                    Properties propertie = new Properties();
+                    propertie.load(inputStream);
+                    reinstalacion_tex = propertie.getProperty(k_iniciales_reinstalacion_num);
+                    if (reinstalacion_tex != null) {
+                        reinstalacion_num = Integer.parseInt(reinstalacion_tex);
+                    }
+                }
+            }
+            recursos_modificables.instalar_carpeta_fuera(es_reinstalacion, mainclass
                     , k_ruta_relativa_recursos
                     , ok);
             if (ok.es == false) { return false; }
-            recursos_modificables.instalar_carpeta_fuera(mainclass
+            recursos_modificables.instalar_carpeta_fuera(es_reinstalacion, mainclass
                     , k_ruta_relativa_internacionalizacion
                     , ok);
             if (ok.es == false) { return false; }
             if (properties == null) {
                 properties = new Properties();
             }
-            // load a properties file
-            String ruta_properties;
+            // Cargar un archivo properties
             ruta_properties = mainclass.getPackageName();
-            File file = new File(k_ruta_relativa_recursos, ruta_properties + k_extension_properties);
+            file = new File(k_ruta_relativa_recursos, ruta_properties + k_extension_properties);
             ruta_properties = file.getCanonicalPath();
-            InputStream inputStream = Resources.getResourceAsStream(mainclass, ruta_properties);
+            inputStream = Resources.getResourceAsStream(mainclass, ruta_properties);
             if (inputStream == null) {
                 ruta_properties = k_ruta_relativa_properties;
                 inputStream = Resources.getResourceAsStream(mainclass, ruta_properties);
@@ -70,16 +108,38 @@ public abstract class iniciales extends bases {
             if (inputStream != null) {
                 Properties propertie = new Properties();
                 propertie.load(inputStream);
-                for (Entry<Object, Object> entry: propertie.entrySet()) {
-                    if (properties.containsKey(entry.getKey())) {
-                        ok.id = k_propiedad_duplicada;
-                        ok.gravedad = oks.k_gravedad_baja;
-                        ok.setTxt(tr.in(in, "Propiedad duplicada: ") + entry.getKey());
-                        break;
-                    }
-                    properties.setProperty((String) entry.getKey(), (String) entry.getValue());
-                }
                 inputStream.close();
+                if (es_reinstalacion == false) {
+                    reinstalacion_tex = propertie.getProperty(k_iniciales_reinstalacion_num);
+                    if (reinstalacion_tex != null) {
+                        reinstalacion_previa_num = Integer.parseInt(reinstalacion_tex);
+                        if (reinstalacion_previa_num < reinstalacion_num) {
+                            _iniciar_desde_clase(true, mainclass, ok, extras_array);
+                            if (ok.es == false) { return false; }
+                            es_reinstalacion_realizada = true;
+                            properties.setProperty(k_iniciales_reinstalacion_num
+                                    , String.valueOf(reinstalacion_num));
+                            _terminar_desde_clase(mainclass, ok, extras_array);
+                            if (ok.es == false) { return false; }
+                            properties.remove(k_iniciales_reinstalacion_num);
+                        }
+                    }
+                }
+                if (es_reinstalacion_realizada == false) {
+                    String clave;
+                    for (Entry<Object, Object> entry : propertie.entrySet()) {
+                        clave = entry.getKey().toString();
+                        if (clave.equals(k_iniciales_reinstalacion_num) == false) {
+                            if (properties.containsKey(entry.getKey())) {
+                                ok.id = k_propiedad_duplicada;
+                                ok.gravedad = oks.k_gravedad_baja;
+                                ok.setTxt(tr.in(in, "Propiedad duplicada: ") + entry.getKey());
+                                break;
+                            }
+                            properties.setProperty((String) entry.getKey(), (String) entry.getValue());
+                        }
+                    }
+                }
             }
             return ok.es;
         } catch (Exception e) {
