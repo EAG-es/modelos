@@ -23,7 +23,7 @@ public abstract class iniciales extends bases {
     public static String k_ruta_relativa_properties = "/re/configuraciones" + k_extension_properties;  //NOI18N
     public static String k_in_ruta = "in/innui/modelos/configuraciones/in";  //NOI18N
     public static String k_propiedad_duplicada = "propiedad_duplicada";
-    public static String k_iniciales_reinstalacion_num = "iniciales.reinstalacion";
+    public static String k_iniciales_reinstalacion_num = "iniciales.reinstalacion_num";
     public Properties properties = null;
     
     /**
