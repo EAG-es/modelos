@@ -176,10 +176,14 @@ public abstract class iniciales extends bases {
                 boolean es_cambio = false;
                 Properties propertie = new Properties();
                 propertie.load(inputStream);
+                String dato_archivo;
                 for (Entry<Object, Object> entry: properties.entrySet()) {
                     if (propertie.containsKey(entry.getKey())) {
-                        es_cambio = true;
-                        propertie.put(entry.getKey(), entry.getValue());
+                        dato_archivo = propertie.getProperty((String) entry.getKey());
+                        if (dato_archivo.equals((String) entry.getValue()) == false) {
+                            es_cambio = true;
+                            propertie.put(entry.getKey(), entry.getValue());
+                        }
                     }
                 }
                 inputStream.close();
