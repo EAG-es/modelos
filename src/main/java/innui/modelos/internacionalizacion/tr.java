@@ -23,7 +23,7 @@ public class tr extends bases {
         try {
             String texto = null;
             if (base != null) {
-                return base.in(in, clave);
+                return tr.in(in, clave);
             } else {
                 try {
                     texto = in.getString(clave);
@@ -45,7 +45,7 @@ public class tr extends bases {
     public static void escribir(String texto) throws Exception {
         try  {
             if (base != null) {
-                base.escribir(texto);
+                tr.escribir(texto);
             } else {
                 System.err.println("tr: ¿" + texto + "?");
             }
